@@ -10,24 +10,25 @@ import {
 } from "./../_shared/functions.js";
 
 // Create an HttpUser instance to handle API calls
-const api = new HttpUser();
+//const api = new HttpUser();
 
 const formLogin = document.querySelector("#formLogin");
 formLogin.addEventListener("submit", async (e) => {
     e.preventDefault();
-    try {
-        const response = await api.post('/login', new FormData(formLogin));
-        console.log(response);
-        if (response.type == "error" || response.type == "warning") {
-            showToast(response.message, response.type);
-            return;
-        }
-        showToast(`Olá, ${getFirstName(response.user.name)} como vai!`);
-        setTimeout(() => {
-            window.location.href = getBackendUrl("app");
-        }, 3000);
-    } catch (error) {
-        console.error('Erro na requisição:', error);
-        showToast('Erro ao fazer login', 'error');
+  
+    const response = await fetch(getBackendUrlApi("users/login"), {
+      method: "POST",
+      body: new FormData(formLogin),
+    });
+  
+    const data = await response.json();
+  
+    if (data.type === "success") {
+      localStorage.setItem("userAuth", JSON.stringify(data.user));
+      setTimeout(() => {
+        window.location.href = getBackendUrl("app/");
+      }, 1500);
     }
-});
+  
+    showToast(data.message);
+  });

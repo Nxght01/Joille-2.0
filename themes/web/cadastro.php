@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
   <link rel="stylesheet" href="assets/css/web/cadastro.css">
-  <script type="module" src="<?= url("assets/js/web/cadastro.js"); ?>" async></script>
+  <script type="module"  defer src="<?= url("assets/js/web/cadastro.js"); ?>"></script>
 </head>
 <body>
   <div class="register-container">

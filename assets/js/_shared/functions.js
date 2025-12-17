@@ -1,73 +1,58 @@
-export const URLpath = "mvc-project-tarde";
-// export const URLpath = "sua-pasta-de-trabalho";
+export const URLpath = "joille";
 
-// Função para retornar a URL do backend
+// Retorno da URL do backend
 export function getBackendUrl(path = "") {
-    return `${location.protocol}//${location.hostname}:8080/${URLpath}/${path}`;
+  const port =
+    location.port && location.port !== "80" && location.port !== "443"
+      ? `:${location.port}`
+      : "";
+  return `${location.protocol}//${location.hostname}${port}/${URLpath}/${path}`;
 }
 
-/*
-export function getBackendUrl(path = "") {
-    return `${location.protocol}//${location.hostname}/${URLpath}/${path}`;
-}
- */
-
-// Função para retornar a URL da API
+// Retorno da URL da API
 export function getBackendUrlApi(path = "") {
-    return `${location.protocol}//${location.hostname}:8080/${URLpath}/api/${path}`;
+  const port =
+    location.port && location.port !== "80" && location.port !== "443"
+      ? `:${location.port}`
+      : "";
+  return `${location.protocol}//${location.hostname}${port}/${URLpath}/api/${path}`;
 }
-
-/*
-export function getBackendUrlApi(path = "") {
-    return `${location.protocol}//${location.hostname}/${URLpath}/api/${path}`;
-}
- */
 
 // Função para preencher os campos do formulário com os dados do objeto
-export function showDataForm (object)  {
-    for(const field in object){
-        if (document.querySelector("#"+field)){
-            document.querySelector("#"+field).value = object[field];
-        }
+export function showDataForm(object) {
+  for (const field in object) {
+    if (document.querySelector("#" + field)) {
+      document.querySelector("#" + field).value = object[field];
     }
-}
-
-// função para preencher um SELECT HTML com uma lista de objetos
-
-export function showDataSelect  (listObj, selectHtml) {
-    listObj.forEach((obj) => {
-        const option = document.createElement("option");
-        option.setAttribute("value",obj.id);
-        option.textContent = obj.name;
-        selectHtml.appendChild(option);
-    });
+  }
 }
 
 // Função para exibir mensagens toast
-export function showToast (message, type = "success") {
-    const toastContainer = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast`;
-    toast.classList.add(type);
-    toast.textContent = message;
+export function showToast(message) {
+  const toastContainer = document.querySelector(".toast-container");
+  const toast = document.createElement("div");
+  toast.className = "toast";
 
-    toastContainer.appendChild(toast);
+  toast.textContent = message;
 
-    // Mostrar a mensagem toast
+  toastContainer.appendChild(toast);
+
+  // Mostrar a mensagem toast
+  setTimeout(() => {
+    toast.classList.add("show");
+    toast.style.padding = "10px";
+  }, 100);
+
+  // Remover a mensagem toast após 3 segundos
+  setTimeout(() => {
+    toast.classList.remove("show");
     setTimeout(() => {
-        toast.classList.add('show');
-    }, 100);
-
-    // Remover a mensagem toast após 3 segundos
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            toastContainer.removeChild(toast);
-        }, 500);
-    }, 3000);
+      toastContainer.removeChild(toast);
+    }, 500);
+  }, 1500);
 }
 
 // Função que recebe o nome completo de uma pessoa e retorna só o primeiro nome
 export function getFirstName(fullName) {
-    return fullName.split(' ')[0];
+  return fullName.split(" ")[0];
 }
