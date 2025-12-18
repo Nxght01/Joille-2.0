@@ -5,6 +5,7 @@ namespace Source\Models;
 use PDOException;
 use Source\Core\Connect;
 use Source\Core\Model;
+
 error_reporting(E_ERROR | E_PARSE);
 class User extends Model
 {
@@ -96,7 +97,7 @@ class User extends Model
     {
         $this->password = $password;
     }
-    
+
 
     public function getMessage(): ?string
     {
@@ -108,43 +109,48 @@ class User extends Model
     }
 
     public function insert(): ?int
-    {
+{
+    $conn = Connect::getInstance();
 
-        $conn = Connect::getInstance();
-
-        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            $this->message = "E-mail Inválido!";
-            return false;
-        }
-
-        $query = "SELECT * FROM users WHERE email LIKE :email";
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->execute();
-
-        if ($stmt->rowCount() == 1) {
-            $this->message = "E-mail já cadastrado!";
-            return false;
-        }
-
-        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-
-        $query = "INSERT INTO users (name, email, password) 
-                  VALUES (:name, :email, :password)";
-
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":name", $this->name);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":password", $this->password);
-
-        try {
-            $stmt->execute();
-            return $conn->lastInsertId();
-        } catch (PDOException) {
-            $this->message = "Por favor, informe todos os campos!";
-            return false;
-        }
+    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+        $this->message = "E-mail Inválido!";
+        return false;
     }
+
+    // Verifica se a senha tem pelo menos 8 caracteres
+    if (strlen($this->password) < 8) {
+        $this->message = "A senha deve ter no mínimo 8 caracteres!";
+        return false;
+    }
+
+    $query = "SELECT * FROM users WHERE email LIKE :email";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(":email", $this->email);
+    $stmt->execute();
+
+    if ($stmt->rowCount() == 1) {
+        $this->message = "E-mail já cadastrado!";
+        return false;
+    }
+
+    $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+
+    $query = "INSERT INTO users (name, email, password) 
+              VALUES (:name, :email, :password)";
+
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(":name", $this->name);
+    $stmt->bindParam(":email", $this->email);
+    $stmt->bindParam(":password", $this->password);
+
+    try {
+        $stmt->execute();
+        return $conn->lastInsertId();
+    } catch (PDOException) {
+        $this->message = "Por favor, informe todos os campos!";
+        return false;
+    }
+}
 
     public function login(string $email, string $password): bool
     {
@@ -173,7 +179,6 @@ class User extends Model
         $this->message = "Usuário logado com sucesso!";
 
         return true;
-
     }
 
     public function setPhoto(?string $photo): void
@@ -181,11 +186,11 @@ class User extends Model
         $this->photo = $photo;
     }
 
-    public function update () : bool
+    public function update(): bool
     {
         $conn = Connect::getInstance();
 
-        if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
+        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             $this->message = "E-mail inválido!";
             return false;
         }
@@ -196,19 +201,18 @@ class User extends Model
         $stmt->bindParam(":id", $this->id);
         $stmt->execute();
 
-        if($stmt->rowCount() == 1) {
+        if ($stmt->rowCount() == 1) {
             $this->message = "E-mail já cadastrado!";
             return false;
         }
 
         $query = "UPDATE users 
-                  SET name = :name, email = :email, address = :address
+                  SET name = :name, email = :email
                   WHERE id = :id";
 
         $stmt = $conn->prepare($query);
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":address", $this->address);
         $stmt->bindParam(":id", $this->id);
 
         try {
@@ -219,10 +223,9 @@ class User extends Model
             $this->message = "Erro ao atualizar: {$exception->getMessage()}";
             return false;
         }
-
     }
 
-    public function updatePassword (string $password, string $newPassword, string $confirmNewPassword) : bool
+    public function updatePassword(string $password, string $newPassword, string $confirmNewPassword): bool
     {
         $query = "SELECT * FROM users WHERE id = :id";
         $conn = Connect::getInstance();
@@ -259,39 +262,46 @@ class User extends Model
             $this->message = "Erro ao atualizar: {$exception->getMessage()}";
             return false;
         }
+    }
+    
 
+   public function updatePhoto(): bool
+{
+    $conn = Connect::getInstance();
+
+    // Buscar foto atual
+    $query = "SELECT photo FROM users WHERE id = :id";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(":id", $this->id, \PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    // Se existir foto e o arquivo existir no disco, apagar
+    if (!empty($result["photo"])) {
+        $filePath = __DIR__ . "/../../" . $result["photo"];
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 
-    public function updatePhoto (): bool
-    {
-        // selecionar o usuário, se tiver foto, apagar para gravar nova
-        $query = "SELECT photo FROM users WHERE id = :id";
-        $stmt = Connect::getInstance()->prepare($query);
-        $stmt->bindParam(":id", $this->id);
+    // Atualizar nova foto
+    $query = "UPDATE users 
+              SET photo = :photo 
+              WHERE id = :id";
+
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(":photo", $this->photo);
+    $stmt->bindParam(":id", $this->id, \PDO::PARAM_INT);
+
+    try {
         $stmt->execute();
-        $result = $stmt->fetch();
-        // ser houver foto, apagar do diretório
-        if ($result->photo) {
-            unlink(__DIR__ . "/../../{$result->photo}");
-        }
-
-        $query = "UPDATE users 
-                  SET photo = :photo 
-                  WHERE id = :id";
-
-        $stmt = Connect::getInstance()->prepare($query);
-        $stmt->bindParam(":photo", $this->photo);
-        $stmt->bindParam(":id", $this->id);
-
-        try {
-            $stmt->execute();
-            $this->message = "Foto atualizada com sucesso!";
-            return true;
-        } catch (PDOException $exception) {
-            $this->message = "Erro ao atualizar: {$exception->getMessage()}";
-            return false;
-        }
-
+        $this->message = "Foto atualizada com sucesso!";
+        return true;
+    } catch (PDOException $exception) {
+        $this->message = "Erro ao atualizar: {$exception->getMessage()}";
+        return false;
     }
-
+}
 }

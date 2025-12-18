@@ -12,53 +12,56 @@ class Users extends Api
 
 {
 
-    public function updatePhoto(array $data)
-    {
+   public function updatePhoto(array $data)
+{
+    $this->auth();
 
-        $imageUploader = new ImageUploader();
-        $photo = (!empty($_FILES["photo"]["name"]) ? $_FILES["photo"] : null);
+    $imageUploader = new ImageUploader();
+    $photo = (!empty($_FILES["photo"]["name"]) ? $_FILES["photo"] : null);
 
-        $this->auth();
-
-        if (!$photo) {
-            $this->back([
-                "type" => "error",
-                "message" => "Por favor, envie uma foto do tipo JPG ou JPEG"
-            ]);
-            return;
-        }
-
-        $upload = $imageUploader->upload($photo);
-
-        $user = new User(
-            id: $this->userAuth->id,
-            photo: $upload
-        );
-
-        if (!$user->updatePhoto()) {
-            $this->back([
-                "type" => "error",
-                "message" => $user->getMessage()
-            ]);
-            return;
-        }
-
+    if (!$photo) {
         $this->back([
-            "type" => "success",
-            "message" => $user->getMessage(),
-            "user" => [
-                "id" => $user->getId(),
-                "name" => $user->getName(),
-                "email" => $user->getEmail(),
-                "photo" => $user->getPhoto()
-            ]
+            "type" => "error",
+            "message" => "Por favor, envie uma foto do tipo JPG ou JPEG"
         ]);
-
+        return;
     }
+
+    $upload = $imageUploader->upload($photo);
+
+    $user = new User(
+        id: $this->userAuth->id,
+        photo: $upload
+    );
+
+    if (!$user->updatePhoto()) {
+        $this->back([
+            "type" => "error",
+            "message" => $user->getMessage()
+        ]);
+        return;
+    }
+
+    // Buscar dados atualizados e converter para objeto
+    $users = new User();
+    $userData = $users->selectById($this->userAuth->id);
+    $updatedUser = (object) $userData;
+
+    $this->back([
+        "type" => "success",
+        "message" => $user->getMessage(),
+        "user" => [
+            "id" => $updatedUser->id,
+            "name" => $updatedUser->name,
+            "email" => $updatedUser->email,
+            "photo" => $updatedUser->photo
+        ]
+    ]);
+}
 
     public function setPassword(array $data)
     {
-        if(!$this->userAuth){
+        if (!$this->userAuth) {
             $this->back([
                 "type" => "error",
                 "message" => "Você não pode estar aqui.."
@@ -68,7 +71,7 @@ class Users extends Api
 
         $user = new User($this->userAuth->id);
 
-        if(!$user->updatePassword($data["password"],$data["newPassword"],$data["confirmNewPassword"])){
+        if (!$user->updatePassword($data["password"], $data["newPassword"], $data["confirmNewPassword"])) {
             $this->back([
                 "type" => "error",
                 "message" => $user->getMessage()
@@ -83,7 +86,7 @@ class Users extends Api
     }
 
 
-    public function tokenValidate ()
+    public function tokenValidate()
     {
         $this->auth();
 
@@ -99,16 +102,16 @@ class Users extends Api
     }
 
 
-    public function listUsers ()
+    public function listUsers()
     {
         $users = new User();
         $this->back($users->selectAll());
     }
 
-    public function createUser (array $data)
+    public function createUser(array $data)
     {
 
-        if(in_array("", $data)) {
+        if (in_array("", $data)) {
             $this->back([
                 "type" => "error",
                 "message" => "Preencha todos os campos"
@@ -129,7 +132,7 @@ class Users extends Api
 
         $insertUser = $user->insert();
 
-        if(!$insertUser){
+        if (!$insertUser) {
             $this->back([
                 "type" => "error",
                 "message" => $user->getMessage()
@@ -141,15 +144,58 @@ class Users extends Api
             "type" => "success",
             "message" => "Usuário cadastrodo com sucesso!"
         ]);
+    }
+    public function updateProfile(array $data)
+{
+    $this->auth();
 
+    if (empty($data["name"]) || empty($data["email"])) {
+        $this->back([
+            "type" => "error",
+            "message" => "Preencha todos os campos"
+        ]);
+        return;
     }
 
-    public function getUser ()
+    $user = new User(
+        id: $this->userAuth->id,
+        name: $data["name"],
+        email: $data["email"]
+    );
+
+    if (!$user->update()) {
+        $this->back([
+            "type" => "error",
+            "message" => $user->getMessage()
+        ]);
+        return;
+    }
+
+    // Buscar dados atualizados e converter para objeto
+    $users = new User();
+    $userData = $users->selectById($this->userAuth->id);
+    $updatedUser = (object) $userData;
+
+    $this->back([
+        "type" => "success",
+        "message" => $user->getMessage(),
+        "user" => [
+            "id" => $updatedUser->id,
+            "name" => $updatedUser->name,
+            "email" => $updatedUser->email,
+            "photo" => $updatedUser->photo
+        ]
+    ]);
+}
+    public function getUser()
     {
         $this->auth();
 
         $users = new User();
-        $user = $users->selectById($this->userAuth->id);
+        $userData = $users->selectById($this->userAuth->id);
+
+        // Converte array para objeto
+        $user = (object) $userData;
 
         $this->back([
             "type" => "success",
@@ -158,16 +204,15 @@ class Users extends Api
                 "id" => $this->userAuth->id,
                 "name" => $user->name,
                 "email" => $user->email,
-                "address" => $user->address,
                 "photo" => $user->photo
             ]
         ]);
-
     }
 
-    public function loginUser (array $data) {
+    public function loginUser(array $data)
+    {
         $user = new User();
-    
+
         if (!$user->login($data["email"], $data["password"])) {
             $this->back([
                 "type" => "error",
@@ -175,7 +220,7 @@ class Users extends Api
             ]);
             return;
         }
-    
+
         $token = new TokenJWT();
         $this->back([
             "type" => "success",
@@ -184,44 +229,46 @@ class Users extends Api
                 "id" => $user->getId(),
                 "name" => $user->getName(),
                 "email" => $user->getEmail(),
+                "photo" => $user->getPhoto(),
                 "token" => $token->create([
                     "id" => $user->getId(),
                     "name" => $user->getName(),
-                    "email" => $user->getEmail()
+                    "email" => $user->getEmail(),
+                    "photo" => $user->getPhoto()
                 ])
             ]
         ]);
     }
-    
-    public function loginAdmin (array $data)
-    {
-        $user = new User();
 
-        if(!$user->loginAdmin($data["email"],$data["password"])){
-            $this->back([
-                "type" => "error",
-                "message" => $user->getMessage()
-            ]);
-            return;
-        }
-        $token = new TokenJWT();
-        $this->back([
-            "type" => "success",
-            "message" => $user->getMessage(),
-            "user" => [
-                "id" => $user->getId(),
-                "name" => $user->getName(),
-                "email" => $user->getEmail(),
-                "token" => $token->create([
-                    "id" => $user->getId(),
-                    "name" => $user->getName(),
-                    "email" => $user->getEmail()
-                ])
-            ]
-        ]);
+    // public function loginAdmin (array $data)
+    // {
+    //     $user = new User();
 
-    }
+    //     if(!$user->loginAdmin($data["email"],$data["password"])){
+    //         $this->back([
+    //             "type" => "error",
+    //             "message" => $user->getMessage()
+    //         ]);
+    //         return;
+    //     }
+    //     $token = new TokenJWT();
+    //     $this->back([
+    //         "type" => "success",
+    //         "message" => $user->getMessage(),
+    //         "user" => [
+    //             "id" => $user->getId(),
+    //             "name" => $user->getName(),
+    //             "email" => $user->getEmail(),
+    //             "token" => $token->create([
+    //                 "id" => $user->getId(),
+    //                 "name" => $user->getName(),
+    //                 "email" => $user->getEmail()
+    //             ])
+    //         ]
+    //     ]);
 
-    
-    
+    // }
+
+
+
 }

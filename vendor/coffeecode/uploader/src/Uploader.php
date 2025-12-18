@@ -13,8 +13,9 @@ abstract class Uploader
     /** @var string */
     protected string $path;
 
-    /** @var resource */
+    /** @var resource|\GdImage */
     protected $file;
+
 
     /** @var string */
     protected string $name;

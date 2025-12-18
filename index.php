@@ -23,8 +23,7 @@ $route->get("/cadastro","Web:cadastro");
 // Rotas amigáveis da área restrita
 $route->group("/app");
 
-$route->get("/", "App:home");
-$route->get("/perfil", "App:profile");
+$route->get("/", "App:profile");
 //$route->get("/carrinho", "App:cart");
 
 $route->group(null);

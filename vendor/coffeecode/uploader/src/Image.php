@@ -61,13 +61,13 @@ class Image extends Uploader
     protected function imageCreate(array $image): bool
     {
         if ($image['type'] == "image/jpeg") {
-            $this->file = imagecreatefromjpeg($image['tmp_name']);
+            $this->file = \imagecreatefromjpeg($image['tmp_name']);
             $this->ext = "jpg";
             return true;
         }
 
         if ($image['type'] == "image/png") {
-            $this->file = imagecreatefrompng($image['tmp_name']);
+            $this->file = \imagecreatefrompng($image['tmp_name']);
             $this->ext = "png";
             return true;
         }

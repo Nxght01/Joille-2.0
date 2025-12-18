@@ -5,6 +5,7 @@
 <?php
     $this->start("specific-script");
 ?>
+<link rel="stylesheet" href="assets/css/web/faqs.css">
 <script src="<?= url("assets/js/web/faqs.js"); ?>"></script>
 <?php
     $this->end();

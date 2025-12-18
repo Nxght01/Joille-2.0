@@ -28,8 +28,10 @@
         <input type="password" id="password" name="password" >
       </div>
       <button type="submit">Cadastre-se</button>
-      <a href="<?= url("login")?>"><span>tem cadastro? faça seu login aqui</span></a>
+      <hr>
+      <a href="<?= url("login")?>"><span>Tem cadastro? faça seu login aqui</span></a>
     </form>
+    <div class="toast-container"></div>
   </div>
 </body>
 </html>

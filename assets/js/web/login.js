@@ -25,10 +25,15 @@ formLogin.addEventListener("submit", async (e) => {
   
     if (data.type === "success") {
       localStorage.setItem("userAuth", JSON.stringify(data.user));
+      showToast(data.message);
       setTimeout(() => {
         window.location.href = getBackendUrl("app/");
       }, 1500);
+    }else{
+      if(data.type === "error"){
+        showToast(data.message);
+      }
     }
   
-    showToast(data.message);
+    
   });

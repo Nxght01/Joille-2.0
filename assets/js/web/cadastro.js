@@ -1,12 +1,10 @@
-import {
-    HttpUser
-} from '../classes/HttpUser.js';
+import { HttpUser } from "../classes/HttpUser.js";
 
 import {
-    getBackendUrl,
-    getBackendUrlApi,
-    getFirstName,
-    showToast
+  getBackendUrl,
+  getBackendUrlApi,
+  getFirstName,
+  showToast,
 } from "./../_shared/functions.js";
 
 const formRegister = document.querySelector("#formRegister");
@@ -21,10 +19,14 @@ formRegister.addEventListener("submit", async (event) => {
     });
     const data = await response.json();
     if (data.type === "success") {
+      showToast(data.message);
       setTimeout(() => {
-        window.location.href = getBackendUrl("/login")
+        window.location.href = getBackendUrl("/login");
       }, 500);
     } else {
+      if (data.type === "error") {
+        showToast(data.message);
+      }
     }
   } catch (error) {
     console.log("Erro na requisição:", error);

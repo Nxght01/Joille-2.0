@@ -9,11 +9,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <link rel="stylesheet" href="assets/css/web/login.css">
-  <script type="module" src="<?= url("assets/js/web/login.js"); ?>" async></script>
+  <script type="module" refer src="<?= url("assets/js/web/login.js"); ?>" async></script>
 </head>
 <body>
   <div class="login-container">
     <h2>Login</h2>
+    
     <form id="formLogin" action="#" method="POST">
       <div class="form-group">
         <label for="email">Email:</label>
@@ -24,8 +25,10 @@
         <input type="password" id="password" name="password" required>
       </div>
       <button type="submit">Entrar</button>
+      <hr>
       <a href="<?= url("cadastro") ?>"><span>Não tem uma conta? Cadastre-se aqui.</span></a>
     </form>
+    <div class="toast-container"></div>
   </div>
 </body>
 </html>

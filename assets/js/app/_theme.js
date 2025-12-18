@@ -9,9 +9,24 @@ import {
 if(!userAuth){
     window.location.href = getBackendUrl("login");
 }
+let userInfo = JSON.parse(localStorage.getItem("userAuth"));
 
-// Código aqui está repetitivo, pois o thema faz a validação do token por tempo
-// e depois os demais scripts também farão a validação do token por tempo
+const imageUser = document.querySelector("#imageUser");
+
+if (userInfo?.photo) {
+    imageUser.src = getBackendUrl(userInfo.photo);
+}
+
+const logout = document.querySelector("#logout")
+const spanUser = document.querySelector("#span-user")
+spanUser.innerHTML = `Olá, ${userInfo.name}`; 
+
+logout.addEventListener("click", async (e) => {
+    e.preventDefault();
+  localStorage.removeItem("userAuth");
+  window.location.href = getBackendUrl("");
+})
+
 
 fetch(getBackendUrlApi("users/token-validate"), {
     method: "GET",

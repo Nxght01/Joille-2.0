@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 17/12/2025 às 20:55
+-- Tempo de geração: 18/12/2025 às 19:45
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -69,6 +69,31 @@ CREATE TABLE `payments` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `questions`
+--
+
+CREATE TABLE `questions` (
+  `id` int(11) NOT NULL,
+  `question` varchar(255) NOT NULL,
+  `answer` mediumtext NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Despejando dados para a tabela `questions`
+--
+
+INSERT INTO `questions` (`id`, `question`, `answer`, `created_at`) VALUES
+(1, 'O que é o sistema Joille?', 'O Joille é um sistema de gerenciamento desenvolvido para empresas de pequeno porte dos ramos de joalheria e bijuteria, com foco em organização e praticidade.', '2025-12-17 21:41:57'),
+(2, 'Para quem o sistema é indicado?', 'O sistema é indicado para pequenos empreendedores que buscam uma solução simples e eficiente para gerenciar seus serviços.', '2025-12-17 21:41:57'),
+(3, 'Preciso instalar algum programa para usar o Joille?', 'Não. O Joille é um sistema online e pode ser acessado diretamente pelo navegador.', '2025-12-17 21:41:57'),
+(4, 'O sistema funciona em celulares e tablets?', 'Sim. O Joille é responsivo e pode ser utilizado em computadores, tablets e smartphones.', '2025-12-17 21:41:57'),
+(5, 'Meus dados ficam seguros no sistema?', 'Sim. O sistema utiliza boas práticas de segurança para proteger os dados dos usuários.', '2025-12-17 21:41:57'),
+(6, 'Como posso entrar em contato com a equipe?', 'Você pode utilizar a aba Contato disponível no site ou entrar em contato pelas redes sociais.', '2025-12-17 21:41:57');
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `services`
 --
 
@@ -115,17 +140,16 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `atributes` text DEFAULT NULL
+  `photo` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Despejando dados para a tabela `users`
 --
 
-INSERT INTO `users` (`id`, `status_id`, `services_id`, `name`, `email`, `password`, `atributes`) VALUES
-(12, NULL, NULL, 'antonio', 'antonioajudouoeliasapassar@gmail.com', '$2y$10$Aj6mAXWCIXM2s0hOtRjxAOSLYqjfhhqZ5Gh4mVptUchADFCTvYGxq', NULL),
-(17, NULL, NULL, 'elias', 'elias@gmail.com', '$2y$10$jdJPPL9VprXbMGoUQaIwq.8fEsgkw.rhKI8cQb7FuLkJX3N2sTLM2', NULL),
-(20, NULL, NULL, 'antonio', 'antonio@gmail.com', '$2y$10$UiYKqLQkuALZnXhs6u5cOeNGXyaV8jos6hvE3koK6YrLyX0SKb1IS', NULL);
+INSERT INTO `users` (`id`, `status_id`, `services_id`, `name`, `email`, `password`, `photo`) VALUES
+(21, NULL, NULL, 'antonio', 'antonio@gmail.com', '$2y$10$14V.qO6ohHIGGq3GEeaHJ.goCYdrM6EtEHMfddaAMk1GuhXu/Yr..', 'uploads/images/2025/12/1c8fdfc18d634b9b0d8000638906bc0469444a6ad48f0.jpg'),
+(25, NULL, NULL, 'eliasaaa', 'elias@gmail.com', '$2y$10$53rTFDeBUiiWjDMVCTv9nunH89X2SF2YzDS0soyBjDAQ/NOS3kAfW', 'uploads/images/2025/12/63327ead831a117b5faab1ade0e99d7769444a554df39.jpg');
 
 -- --------------------------------------------------------
 
@@ -159,6 +183,12 @@ ALTER TABLE `contacts`
 -- Índices de tabela `payments`
 --
 ALTER TABLE `payments`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `questions`
+--
+ALTER TABLE `questions`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -211,6 +241,12 @@ ALTER TABLE `payments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de tabela `questions`
+--
+ALTER TABLE `questions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT de tabela `services`
 --
 ALTER TABLE `services`
@@ -226,7 +262,7 @@ ALTER TABLE `status`
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de tabela `users_categories`

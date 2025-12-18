@@ -23,13 +23,14 @@ $route->namespace("Source\App\Api");
 // Users routes
 $route->group("/users");
 $route->get("/", "Users:listUsers");
+$route->post("/login", "Users:loginUser");
 $route->post("/","Users:createUser");
-$route->get("/me","Users:getUser");
-$route->post("/login","Users:loginUser");
-$route->put("/update","Users:updateUser");
-$route->post("/photo","Users:updatePhoto");
+$route->put("/update","Users:updateProfile");
 $route->post("/set-password","Users:setPassword");
 $route->get("/token-validate", "Users:tokenValidate");
+$route->get("/user", "Users:getUser");
+$route->post("/users/profile", "Users:updateProfile");
+$route->post("/users/photo", "Users:updatePhoto");
 $route->group("null");
 
 // Services routes

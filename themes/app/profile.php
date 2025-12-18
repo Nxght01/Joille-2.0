@@ -24,12 +24,10 @@ $this->end();
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
         </div>
-        <div class="form-group">
-            <label for="endereco">Endereço:</label>
-            <input type="text" id="address" name="address">
         <button type="submit">Atualizar Perfil</button>
     </form>
-    <form id="form-photo" enctype="multipart/form-data">
+    <div class="toast-container"></div>
+    <form id="form-photo">
         <div class="form-group">
             <label for="foto">Foto:</label>
             <input type="file" id="photo" name="photo">

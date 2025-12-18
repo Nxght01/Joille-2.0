@@ -1,50 +1,49 @@
 <?php
     echo $this->layout("_theme");
 ?>
+
 <?php
     $this->start("specific-script");
 ?>
-    <script type="module" src="<?= url("assets/js/web/about.js"); ?>" async></script>
+<script type="module" src="<?= url("assets/js/web/about.js"); ?>" async></script>
 <?php
     $this->end();
 ?>
-<!DOCTYPE html>
-<html lang="pt">
 
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sobre Nós</title>
-    <!-- Link para o arquivo CSS -->
-    <link rel="stylesheet" href="assets/css/web/services.css">
+
+    <link rel="stylesheet" href="<?= url("assets/css/web/about.css"); ?>">
 </head>
 
 <body>
-    <!-- Container para a aba "Sobre nós" -->
-    <div class="sobre-nos">
-        <!-- Título da seção -->
-        <h1>Sobre Nós</h1>
-        
-        <!-- Parágrafos com informações sobre a empresa ou organização -->
-        <p>Bem-vindo à nossa página "Sobre Nós". Somos uma empresa dedicada a fornecer produtos e serviços de alta qualidade aos nossos clientes.</p>
-        <p>Nosso compromisso é oferecer soluções inovadoras e um atendimento excepcional para atender às suas necessidades.</p>
-        
-        <!-- Imagem ilustrativa -->
-        <img src="caminho-para-imagem.jpg" alt="Imagem da empresa">
-        
-        <!-- Lista de pontos-chave sobre a empresa -->
-        <ul>
-            <li>Missão: Fornecer soluções de alta qualidade.</li>
-            <li>Visão: Ser referência em nosso setor.</li>
-            <li>Valores: Inovação, ética e excelência.</li>
-        </ul>
-        
-        <!-- Links para redes sociais ou outras páginas -->
-        <p>Saiba mais sobre nós nas nossas redes sociais:</p>
-        <a href="link-facebook">Facebook</a><br>
-        <a href="link-instagram">Instagram</a><br>
-    </div>
-</body>
 
+    <div class="sobre-nos">
+        <h1>Sobre Nós</h1>
+
+        <p class="paragraph">
+            A <strong>Joille</strong> é um sistema de gerenciamento desenvolvido para empresas de pequeno porte
+            dos ramos de joalheria e bijuteria.
+        </p>
+
+        <p class="paragraph">
+            O projeto surgiu da necessidade de um sistema único, capaz de integrar múltiplas funções essenciais
+            em uma única plataforma, trazendo organização, agilidade e controle ao negócio.
+        </p>
+
+        <img src="<?= url("assets/images/sobreimagemjoia.jpg"); ?>" alt="Imagem da empresa">
+
+        <ul>
+            <li><strong>Missão:</strong> Fornecer soluções de alta qualidade.</li>
+            <li><strong>Visão:</strong> Ser referência no setor.</li>
+            <li><strong>Valores:</strong> Inovação, ética e excelência.</li>
+        </ul>
+    </div>
+
+</body>
 </html>
