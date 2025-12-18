@@ -23,5 +23,12 @@ class App
     {
         echo $this->view->render("profile",[]);
     }
-
+    public function services ()
+    {
+        echo $this->view->render("services",[]);
+    }
+    public function password ()
+    {
+        echo $this->view->render("password",[]);
+    }
 }

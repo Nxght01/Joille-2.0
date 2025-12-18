@@ -24,6 +24,9 @@ $route->get("/cadastro","Web:cadastro");
 $route->group("/app");
 
 $route->get("/", "App:profile");
+$route->get("/servicos", "App:services");
+$route->get("/redefinir-senha", "App:password");
+
 //$route->get("/carrinho", "App:cart");
 
 $route->group(null);

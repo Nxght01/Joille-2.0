@@ -19,9 +19,8 @@
         <span id="span-user">Olá, Fulano!</span>
     </div>
     <a href="<?= url("/app/"); ?>">Perfil</a>
-    <a href="#">Meus Pedidos</a>
-    <a href="#">Configurações</a>
-    <a href="#">Mensagens</a>
+    <a href="<?= url("/app/servicos"); ?>">Serviços</a>
+    <a href="<?= url("/app/redefinir-senha"); ?>">Redefinir Senha</a>
     <a href="<?= url("/app/carrinho"); ?>">Carrinho</a>
     <a id="logout">Sair</a>
 </nav>
