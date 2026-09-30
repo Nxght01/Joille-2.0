@@ -1,0 +1,128 @@
+/* ==========================================================================
+   1. CONFIGURAÇÕES GERAIS E RESET
+   ========================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    /* Previne problemas de largura e altura ao usar padding */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f7;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Estrutura flexível para o rodapé colar no fim da tela */
+}
+
+/* ==========================================================================
+   2. CABEÇALHO (HEADER)
+   ========================================================================== */
+/*
+ * `body > header` e NÃO `header`: o seletor de elemento alcançava qualquer
+ * <header> dentro das páginas. O cabeçalho da seção de FAQs, por exemplo,
+ * herdava o fundo azul-escuro (título quase ilegível) e o `display: flex`
+ * (título e subtítulo lado a lado em vez de empilhados).
+ */
+body > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    padding: 0 40px;
+    min-height: 90px;
+    /* Trocado 'height' por 'min-height' para não cortar conteúdo no celular */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.header-image {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    width: 140px;
+    height: auto;
+}
+
+/* ==========================================================================
+   3. NAVEGAÇÃO (NAV)
+   ========================================================================== */
+.header-nav-list {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    /* Reset útil caso você use a tag <ul> no HTML */
+    margin: 0;
+    padding: 0;
+}
+
+.header-nav-list a {
+    text-decoration: none;
+    color: #ecf0f1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.header-nav-list a:hover {
+    background-color: #34495e;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   4. CONTEÚDO PRINCIPAL
+   ========================================================================== */
+main,
+section,
+.sobre-nos {
+    flex: 1;
+    /* Substitui o antigo calc(100vh - 180px). O flex: 1 empurra automaticamente o footer para baixo */
+    padding: 40px;
+    /* Dá um respiro para o texto não colar nas bordas do monitor */
+}
+
+/* ==========================================================================
+   5. RODAPÉ (FOOTER)
+   ========================================================================== */
+footer {
+    background-color: #1a252f;
+    color: #ecf0f1;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
+    margin-top: auto;
+    /* Trava o rodapé sempre na parte inferior da página */
+}
+
+/* ==========================================================================
+   6. RESPONSIVIDADE (SMARTPHONES E TABLETS)
+   ========================================================================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        /* Empilha a logo e os links no celular */
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .header-nav-list {
+        flex-wrap: wrap;
+        /* Permite que os botões do menu quebrem de linha se faltar espaço */
+        justify-content: center;
+    }
+
+    main,
+    section,
+    .sobre-nos {
+        padding: 20px;
+        /* Reduz o espaço lateral em telas pequenas para aproveitar melhor a área de leitura */
+    }
+}

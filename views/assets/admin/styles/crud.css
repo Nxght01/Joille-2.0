@@ -1,0 +1,272 @@
+/*
+ * Telas de CRUD do painel administrativo — folha ÚNICA e compartilhada.
+ *
+ * Substitui `editUser.css` e `editCategory.css`. O arranjo anterior era a causa
+ * de várias telas parecerem quebradas:
+ *
+ *   - `editUser.css` era, de fato, a folha compartilhada, mas só Usuários,
+ *     Serviços, FAQs e Mensagens a carregavam. **Categorias não** — e por isso
+ *     ficava sem cartão, sem grade e com o formulário do modal solto na página;
+ *   - mesmo quem a carregava só tinha grade para `.service-item`. As linhas de
+ *     `.user-item` e `.category-item` não recebiam `display: grid`, então as
+ *     colunas viravam um bloco empilhado.
+ *
+ * Agora as quatro telas carregam este arquivo e os seletores cobrem todas as
+ * variações de nome (`users-`, `categories-`, `services-`, `faqs-`).
+ *
+ * O modal e os campos de formulário ficam em `_common/styles/states.css`, que os
+ * três temas já importam.
+ */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: #f4f6f7;
+    color: #333;
+}
+
+main > header {
+    /* Descola o título da barra escura do topo, que é colada no <main> */
+    padding-top: 26px;
+    margin-bottom: 24px;
+}
+
+main > header h1 {
+    color: #3d2c23;
+    font-size: 1.5rem;
+    margin: 0 0 18px;
+}
+
+/* --- casca da listagem ---------------------------------------------------- */
+
+.services-list,
+.users-list,
+.categories-list {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .09);
+    overflow: hidden;
+}
+
+.list-header {
+    background: #f7f4f1;
+    padding: 14px 20px;
+    border-bottom: 2px solid #ede6e0;
+    display: grid;
+    gap: 16px;
+    font-weight: bold;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #6b5b51;
+}
+
+.services-container,
+.users-container,
+.categories-container,
+.faqs-container {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.service-item,
+.user-item,
+.category-item {
+    padding: 14px 20px;
+    display: grid;
+    gap: 16px;
+    border-bottom: 1px solid #f0eae5;
+    align-items: center;
+}
+
+.service-item:last-child,
+.user-item:last-child,
+.category-item:last-child {
+    border-bottom: none;
+}
+
+.service-item:hover,
+.user-item:hover,
+.category-item:hover {
+    background-color: #faf8f6;
+}
+
+/* Os estados (carregando / vazio / erro) ocupam a largura toda */
+.services-container .list-state,
+.users-container .list-state,
+.categories-container .list-state,
+.faqs-container .list-state {
+    margin: 0;
+    padding: 28px 20px;
+}
+
+/* --- grade de cada tela --------------------------------------------------- */
+/*
+ * O cabeçalho e as linhas precisam usar as MESMAS colunas, senão desalinham.
+ *
+ * Três telas reaproveitam as mesmas classes de casca e de item (Serviços, FAQs e
+ * Mensagens todas usam `.services-list` / `.service-item`), então a grade não
+ * pode ser escolhida por elas. Cada cabeçalho recebe uma classe própria
+ * (`list-header-<tela>`) e a linha é alcançada como IRMÃ dele — assim cada tela
+ * define a sua grade sem afetar as outras.
+ *
+ * Serviços (6 colunas) fica em `gallery.css` e Mensagens (5) em `contacts.css`,
+ * junto do resto do que é específico daquelas telas.
+ */
+
+/* Categorias: ID, nome, ações */
+.list-header-categories,
+.list-header-categories ~ .categories-container .category-item {
+    grid-template-columns: 80px 1fr 150px;
+}
+
+/* Usuários: ID, nome, e-mail, perfil, ações */
+.list-header-users,
+.list-header-users ~ .users-container .user-item {
+    grid-template-columns: 70px 1fr 1fr 140px 150px;
+}
+
+/* FAQs: ID, pergunta, tipo, ações */
+.list-header-faqs,
+.list-header-faqs ~ .faqs-container .service-item {
+    grid-template-columns: 70px 1fr 200px 150px;
+}
+
+/* --- botões --------------------------------------------------------------- */
+
+.service-actions,
+.user-actions,
+.category-actions,
+.faq-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    padding: 8px 13px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: .85rem;
+    font-family: inherit;
+    transition: background-color .2s ease;
+}
+
+.btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.btn-edit {
+    background-color: #4a7c9b;
+    color: #fff;
+}
+
+.btn-edit:hover:not(:disabled) {
+    background-color: #3a6580;
+}
+
+.btn-delete,
+.btn-delete-image {
+    background-color: #c0392b;
+    color: #fff;
+}
+
+.btn-delete:hover:not(:disabled) {
+    background-color: #a3301f;
+}
+
+.btn-save {
+    background-color: #2f8f5b;
+    color: #fff;
+}
+
+.btn-save:hover:not(:disabled) {
+    background-color: #26744a;
+}
+
+.btn-cancel {
+    background-color: #7f8c8d;
+    color: #fff;
+}
+
+.btn-cancel:hover:not(:disabled) {
+    background-color: #6a7677;
+}
+
+.btn-view {
+    background-color: #4a7c9b;
+    color: #fff;
+}
+
+.btn-view:hover:not(:disabled) {
+    background-color: #3a6580;
+}
+
+/* --- etiqueta de perfil de acesso ---------------------------------------- */
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: .72rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.badge-admin {
+    background-color: #3d2c23;
+    color: #f5f2ee;
+}
+
+.badge-client {
+    background-color: #e4ecf1;
+    color: #46606f;
+}
+
+/* --- telas estreitas: a grade vira lista rotulada ------------------------ */
+
+@media (max-width: 768px) {
+    .list-header {
+        display: none;
+    }
+
+    .service-item,
+    .user-item,
+    .category-item,
+    .list-header-categories ~ .categories-container .category-item,
+    .list-header-users ~ .users-container .user-item,
+    .list-header-faqs ~ .faqs-container .service-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 16px;
+    }
+
+    /* Sem cabeçalho, cada campo mostra o próprio rótulo via data-label */
+    .service-item span,
+    .user-item span,
+    .category-item span {
+        display: flex;
+        gap: 10px;
+    }
+
+    .service-item span::before,
+    .user-item span::before,
+    .category-item span::before {
+        content: attr(data-label);
+        font-weight: bold;
+        min-width: 90px;
+        color: #6b5b51;
+    }
+
+    .service-actions,
+    .user-actions,
+    .category-actions {
+        justify-content: flex-end;
+    }
+}

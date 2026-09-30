@@ -1,13 +1,11 @@
 <?php
 
 namespace Source\Core;
-// depois retirar a linha abaixo
-//require __DIR__ . "/../Boot/Config.php";
 
-use \PDO;
-use \PDOException;
+use PDO;
+use PDOException;
 
-class Connect
+abstract class Connect
 {
     private const OPTIONS = [
         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
@@ -23,15 +21,20 @@ class Connect
         if (empty(self::$instance)) {
             try {
                 self::$instance = new PDO(
-                    "mysql:host=" . CONF_DB_HOST . ";dbname=" . CONF_DB_NAME,
+                    "mysql:host=" . CONF_DB_HOST . ";port=". CONF_DB_PORT .";dbname=" . CONF_DB_NAME,
                     CONF_DB_USER,
                     CONF_DB_PASS,
                     self::OPTIONS
                 );
             } catch (PDOException $exception) {
-                //redirect("/ops/problemas");
-                echo "Problemas ao Conectar...";
-                echo $exception->getMessage();
+                $response = [
+                    "code" => 500,
+                    "type" => "error",
+                    "status" => "internal_server_error",
+                    "message" => "Problemas ao conectar com o banco de dados! " . $exception->getMessage() . " - " . $exception->getCode()
+                ];
+                echo json_encode($response);
+                exit();
             }
         }
 

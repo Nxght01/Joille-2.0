@@ -2,43 +2,38 @@
 $this->layout("_theme");
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Usuários</title>
-    <link rel="stylesheet" href="<?= url('assets/css/adm/editUser.css'); ?>">
-    <script type="module" src="<?= url('assets/js/adm/edit_user.js'); ?>" async></script>
-</head>
-<body>
+<?php $this->start("specific-style"); ?>
+<link rel="stylesheet" href="<?= url("views/assets/admin/styles/crud.css"); ?>">
+<?php $this->end(); ?>
+
+<?php $this->start("specific-script"); ?>
+<script type="module" src="<?= url("views/assets/admin/scripts/edit_user.js"); ?>"></script>
+<?php $this->end(); ?>
+
 <header>
     <h1>Administração de Usuários</h1>
-    <section class="search-container">
+    <section class="toolbar">
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar pelo nome ou email do usuário...">
+        <button type="button" class="btn btn-new" id="btnNew">+ Novo Administrador</button>
     </section>
 </header>
 
-<!-- Contêiner para as mensagens toast -->
-<div id="toast-container"></div>
-
-<main>
-    <section class="users-list">
-        <header class="list-header">
-            <span>ID</span>
-            <span>Nome</span>
-            <span>Email</span>
-            <span>Ações</span>
-        </header>
-        <section class="users-container" id="usersList">
-            <!-- Users will be dynamically populated here -->
-        </section>
+<section class="users-list services-list">
+    <header class="list-header list-header-users">
+        <span>ID</span>
+        <span>Nome</span>
+        <span>Email</span>
+        <span>Perfil</span>
+        <span>Ações</span>
+    </header>
+    <section class="users-container services-container" id="usersList">
+        <!-- Usuários inseridos dinamicamente aqui -->
     </section>
-</main>
+</section>
 
 <section id="editModal" class="modal">
     <article class="modal-content">
-        <h2>Edição de Usuário</h2>
+        <h2 id="modalTitle">Edição de Usuário</h2>
         <form id="editForm">
             <input type="hidden" id="id" name="id">
 
@@ -53,15 +48,24 @@ $this->layout("_theme");
             </div>
 
             <div class="form-group">
-                <label for="address">Endereço</label>
-                <input type="text" id="address" name="address" class="form-control">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" class="form-control" minlength="8"
+                       placeholder="Obrigatória somente ao criar um novo administrador">
             </div>
 
             <div class="form-group">
-                <label for="role">Papel</label>
-                <select id="role" name="role" class="form-control">
-                    <option value="user">Usuário</option>
-                    <option value="admin">Administrador</option>
+                <label for="type_id">Perfil</label>
+                <select id="type_id" name="type_id" class="form-control">
+                    <option value="2">Cliente</option>
+                    <option value="1">Administrador</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="active">Situação</label>
+                <select id="active" name="active" class="form-control">
+                    <option value="1">Ativo</option>
+                    <option value="0">Inativo</option>
                 </select>
             </div>
 
@@ -72,5 +76,3 @@ $this->layout("_theme");
         </form>
     </article>
 </section>
-</body>
-</html>

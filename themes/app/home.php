@@ -1,5 +1,5 @@
 <?php
-    echo $this->layout("_theme");
+$this->layout("_theme");
 ?>
 
 <div class="content-private">

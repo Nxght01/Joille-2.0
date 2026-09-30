@@ -1,0 +1,113 @@
+/* Página de localização da área pública (/localizacao) */
+
+.location-section {
+    padding: 3rem 0 4.5rem;
+    background-color: #f4f6f7;
+}
+
+.location-section .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+.location-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.location-header h1 {
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #2c3e50;
+    margin: 0 0 .6rem;
+}
+
+.location-header mark {
+    background: transparent;
+    color: #8c6a4f;
+}
+
+.location-header p {
+    color: #5b6b78;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.location-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    gap: 1.75rem;
+    align-items: start;
+}
+
+.location-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .07);
+    font-style: normal; /* <address> vem em itálico por padrão */
+}
+
+.location-card h2 {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #8c6a4f;
+    margin: 1.5rem 0 .4rem;
+}
+
+.location-card h2:first-child {
+    margin-top: 0;
+}
+
+.location-card p {
+    margin: 0;
+    color: #45535e;
+    line-height: 1.7;
+}
+
+.location-card a {
+    color: #2c3e50;
+}
+
+.location-cta {
+    display: inline-block;
+    margin-top: 1.75rem;
+    padding: 11px 20px;
+    border-radius: 8px;
+    background-color: #2c3e50;
+    color: #fff !important;
+    text-decoration: none;
+    font-size: .92rem;
+    transition: background-color .2s ease;
+}
+
+.location-cta:hover {
+    background-color: #8c6a4f;
+}
+
+/* O iframe do mapa não tem proporção própria: sem altura definida ele colapsa */
+.location-map {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .07);
+    background: #e9edef;
+}
+
+.location-map iframe {
+    display: block;
+    width: 100%;
+    height: 460px;
+}
+
+@media (max-width: 820px) {
+    .location-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .location-map iframe {
+        height: 320px;
+    }
+}

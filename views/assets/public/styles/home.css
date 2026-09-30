@@ -1,0 +1,298 @@
+/* ==========================================================================
+   1. IMPORTAÇÃO DE FONTES E CONFIGURAÇÕES GERAIS
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;1,400&family=Roboto:wght@300;400;500&family=Sedan:ital@0;1&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* Garante que padding e border não quebrem o tamanho dos elementos */
+}
+
+body {
+  background: linear-gradient(to right, #f5f5f5, #f0e6d6);
+  /* Gradiente suave de bege a branco */
+  color: #333333;
+  /* Cor de texto escuro */
+  font-family: 'Roboto', sans-serif;
+  /* Fonte moderna e elegante */
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   2. CONTÊINER PRINCIPAL (HERO / APRESENTAÇÃO)
+   ========================================================================== */
+.container {
+  padding: 30px;
+  margin: 40px auto;
+  max-width: 825px;
+  width: 90%;
+  /* Responsividade para telas médias e pequenas */
+  background: #ffffff;
+  border: 1px solid #e0d4c5;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  /* Espaçamento ideal entre a imagem e o texto */
+}
+
+.container:hover {
+  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.15);
+  /* Sombra mais proeminente ao passar o mouse */
+}
+
+/* Correção: Mudado de 'image' para 'img' (tag correta do HTML) */
+img {
+  width: 30%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.texto {
+  flex: 1;
+  font-size: 26px;
+  /* Ajustado para equilíbrio visual */
+  font-family: "Montserrat", sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   3. TIPOGRAFIA (TÍTULOS E TEXTOS)
+   ========================================================================== */
+h1 {
+  font-weight: normal;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  /* Ajustado para não estourar em telas padrão */
+  font-family: "Sedan", serif;
+  font-style: normal;
+  margin: 0 0 10px 0;
+  padding-left: 3px;
+}
+
+.sedan-regular {
+  font-family: "Sedan", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.sedan-regular-italic {
+  font-family: "Sedan", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+h2,
+h3 {
+  color: #1f2d3d;
+  font-size: 28px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+p {
+  font-size: 22px;
+  /* Mantém a leitura grande e fluida que você planejou */
+  line-height: 1.6;
+  text-align: justify;
+  margin-bottom: 20px;
+}
+
+/* Seções de conteúdo interno */
+.sobre {
+  padding: 20px 0;
+  border-bottom: 1px solid #e0d4c5;
+}
+
+.paragraph {
+  color: #4d4d4d;
+  font-size: 22px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+/* ==========================================================================
+   4. CONTÊINER DE ATUAÇÃO / SERVIÇOS
+   ========================================================================== */
+.container-atuacao {
+  margin: 40px auto 100px auto;
+  /* Removido o erro de digitação de espaço em '100 px' */
+  max-width: 825px;
+  width: 90%;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  border: 1px solid #e0d4c5;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+  /* Sincronizado para manter a harmonia visual */
+  /* Removido 'height: 700px' fixo para evitar que o texto transborde em telas menores */
+  min-height: 400px;
+}
+
+/* ==========================================================================
+   5. RODAPÉ (FOOTER)
+   ========================================================================== */
+footer {
+  background-color: #1f2d3d;
+  /* Adicionado um fundo escuro para destacar seus links claros (#f5f5f5) */
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: auto;
+  /* Empurra o rodapé sempre para o fim da página */
+}
+
+footer a {
+  color: #f5f5f5;
+  text-decoration: none;
+  padding: 0 15px;
+  font-size: 16px;
+  transition: color 0.3s ease-in-out;
+}
+
+footer a:hover {
+  color: #b0c4de;
+}
+
+/* ==========================================================================
+   6. RESPONSIVIDADE (PARA CELULARES E TABLETS)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    /* Transforma o layout em coluna no celular (imagem em cima, texto embaixo) */
+    text-align: center;
+    padding: 20px;
+  }
+
+  img {
+    width: 50%;
+    /* Imagem expande um pouco mais no celular */
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 38px;
+    /* Diminui o título para caber em telas pequenas */
+  }
+
+  .texto {
+    font-size: 20px;
+  }
+
+  p,
+  .paragraph,
+  .container-atuacao p {
+    font-size: 18px;
+    /* Tamanho de texto confortável para leitura mobile */
+    text-align: left;
+    /* Alinhamento à esquerda fica melhor no celular do que justificado */
+  }
+
+  .container-atuacao {
+    padding: 25px;
+  }
+}
+/* ==========================================================================
+   6. IMAGEM DE DESTAQUE E CHAMADA PARA AÇÃO
+   ========================================================================== */
+
+/* Coluna de texto do hero: um único flex item com título e parágrafo dentro */
+.hero-texto {
+  flex: 1 1 52%;
+  /* `min-width: 0` é obrigatório: sem ele um flex item não encolhe abaixo do
+     tamanho do próprio conteúdo e empurra a imagem para fora do cartão */
+  min-width: 0;
+}
+
+.hero-texto .texto {
+  font-size: 20px;
+  /* Justificado em coluna estreita abre "rios" de espaço entre as palavras */
+  text-align: left;
+  line-height: 1.55;
+}
+
+/* A classe `.image` era usada no HTML sem existir em nenhuma folha: a foto saía
+   no tamanho original, estourando o cartão. */
+.image {
+  flex: 1 1 44%;
+  min-width: 0;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* Empilha o hero antes de a coluna de texto ficar estreita demais para ler */
+@media (max-width: 860px) {
+  .container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-texto .texto {
+    font-size: 18px;
+  }
+
+  .image {
+    height: 220px;
+  }
+}
+
+.home-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.home-cta a {
+  padding: 12px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.home-cta-primary {
+  background-color: #8c6a4f;
+  color: #fff;
+}
+
+.home-cta-primary:hover {
+  background-color: #70543e;
+}
+
+.home-cta-secondary {
+  background-color: transparent;
+  border: 1px solid #8c6a4f;
+  color: #8c6a4f;
+}
+
+.home-cta-secondary:hover {
+  background-color: #f0e6d6;
+}
+
+@media (max-width: 600px) {
+  .home-cta a {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+}

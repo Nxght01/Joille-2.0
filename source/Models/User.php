@@ -2,40 +2,52 @@
 
 namespace Source\Models;
 
-use PDOException;
-use Source\Core\Connect;
+use PDO;
 use Source\Core\Model;
+use Source\Core\Connect;
+use Source\Core\JWTToken;
 
-error_reporting(E_ERROR | E_PARSE);
 class User extends Model
 {
-    private $id;
-    private $status_id;
-    private $services_id;
-    private $name;
-    private $email;
-    private $password;
-    private $message;
-    private $photo;
+    private ?int $id;
+    private ?int $typeId;
+    private ?int $statusId;
+    private ?int $servicesId;
+    private ?string $name;
+    private ?string $email;
+    private ?string $password;
+    private ?string $photo;
+    private ?int $active;
+
+    private ?string $token = null;
+
+    /** Diferencia "e-mail repetido" de uma falha real de banco no insert(). */
+    private bool $emailConflict = false;
 
     public function __construct(
-        int $id = null,
-        int $status_id = null,
-        int $services_id = null,
-        string $name = null,
-        string $email = null,
-        string $password = null,
-        string $message = null,
-        string $photo = null
+        ?int $id = null,
+        ?int $typeId = null,
+        ?string $name = null,
+        ?string $email = null,
+        ?string $password = null,
+        ?string $photo = null,
+        ?int $statusId = null,
+        ?int $servicesId = null,
+        ?int $active = null
     ) {
         $this->id = $id;
-        $this->status_id = $status_id;
-        $this->services_id = $services_id;
+        $this->typeId = $typeId;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
         $this->photo = $photo;
-        $this->entity = "users";
+        $this->statusId = $statusId;
+        $this->servicesId = $servicesId;
+        $this->active = $active;
+
+        $this->table = 'users'; // nome da tabela do banco
+        $this->primaryKey = 'id'; // nome da chave primária da tabela
+        $this->fillable = ['typeId', 'statusId', 'servicesId', 'name', 'email', 'password', 'photo', 'active']; // camelCase
     }
 
     public function getId(): ?int
@@ -48,24 +60,34 @@ class User extends Model
         $this->id = $id;
     }
 
-    public function getStatus_id(): ?int
+    public function getTypeId(): ?int
     {
-        return $this->status_id;
+        return $this->typeId;
     }
 
-    public function setStatus_id(?int $status_id): void
+    public function setTypeId(?int $typeId): void
     {
-        $this->status_id = $status_id;
+        $this->typeId = $typeId;
     }
 
-    public function getServices_id(): ?int
+    public function getStatusId(): ?int
     {
-        return $this->services_id;
+        return $this->statusId;
     }
 
-    public function setServices_id(?int $services_id): void
+    public function setStatusId(?int $statusId): void
     {
-        $this->services_id = $services_id;
+        $this->statusId = $statusId;
+    }
+
+    public function getServicesId(): ?int
+    {
+        return $this->servicesId;
+    }
+
+    public function setServicesId(?int $servicesId): void
+    {
+        $this->servicesId = $servicesId;
     }
 
     public function getName(): ?string
@@ -98,87 +120,9 @@ class User extends Model
         $this->password = $password;
     }
 
-
-    public function getMessage(): ?string
-    {
-        return $this->message;
-    }
     public function getPhoto(): ?string
     {
         return $this->photo;
-    }
-
-    public function insert(): ?int
-{
-    $conn = Connect::getInstance();
-
-    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-        $this->message = "E-mail Inválido!";
-        return false;
-    }
-
-    // Verifica se a senha tem pelo menos 8 caracteres
-    if (strlen($this->password) < 8) {
-        $this->message = "A senha deve ter no mínimo 8 caracteres!";
-        return false;
-    }
-
-    $query = "SELECT * FROM users WHERE email LIKE :email";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":email", $this->email);
-    $stmt->execute();
-
-    if ($stmt->rowCount() == 1) {
-        $this->message = "E-mail já cadastrado!";
-        return false;
-    }
-
-    $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-
-    $query = "INSERT INTO users (name, email, password) 
-              VALUES (:name, :email, :password)";
-
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":name", $this->name);
-    $stmt->bindParam(":email", $this->email);
-    $stmt->bindParam(":password", $this->password);
-
-    try {
-        $stmt->execute();
-        return $conn->lastInsertId();
-    } catch (PDOException) {
-        $this->message = "Por favor, informe todos os campos!";
-        return false;
-    }
-}
-
-    public function login(string $email, string $password): bool
-    {
-        $query = "SELECT * FROM users WHERE email = :email";
-        $conn = Connect::getInstance();
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":email", $email);
-        $stmt->execute();
-        $result = $stmt->fetch();
-
-        if (!$result) {
-            $this->message = "E-mail não cadastrado!";
-            return false;
-        }
-
-        if (!password_verify($password, $result->password)) {
-            $this->message = "Senha incorreta!";
-            return false;
-        }
-
-        $this->setId($result->id);
-        $this->setName($result->name);
-        $this->setEmail($result->email);
-        $this->setPhoto($result->photo);
-
-        $this->message = "Usuário logado com sucesso!";
-
-        return true;
     }
 
     public function setPhoto(?string $photo): void
@@ -186,122 +130,268 @@ class User extends Model
         $this->photo = $photo;
     }
 
-    public function update(): bool
+    public function getActive(): ?int
     {
-        $conn = Connect::getInstance();
-
-        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-            $this->message = "E-mail inválido!";
-            return false;
-        }
-
-        $query = "SELECT * FROM users WHERE email LIKE :email AND id != :id";
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":id", $this->id);
-        $stmt->execute();
-
-        if ($stmt->rowCount() == 1) {
-            $this->message = "E-mail já cadastrado!";
-            return false;
-        }
-
-        $query = "UPDATE users 
-                  SET name = :name, email = :email
-                  WHERE id = :id";
-
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":name", $this->name);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":id", $this->id);
-
-        try {
-            $stmt->execute();
-            $this->message = "Usuário atualizado com sucesso!";
-            return true;
-        } catch (PDOException $exception) {
-            $this->message = "Erro ao atualizar: {$exception->getMessage()}";
-            return false;
-        }
+        return $this->active;
     }
 
-    public function updatePassword(string $password, string $newPassword, string $confirmNewPassword): bool
+    public function setActive(?int $active): void
     {
-        $query = "SELECT * FROM users WHERE id = :id";
-        $conn = Connect::getInstance();
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":id", $this->id);
-        $stmt->execute();
-        $result = $stmt->fetch();
-
-        if (!password_verify($password, $result->password)) {
-            $this->message = "Senha incorreta!";
-            return false;
-        }
-
-        if ($newPassword != $confirmNewPassword) {
-            $this->message = "As senhas não conferem!";
-            return false;
-        }
-
-        $newPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-
-        $query = "UPDATE users 
-                  SET password = :password 
-                  WHERE id = :id";
-
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":password", $newPassword);
-        $stmt->bindParam(":id", $this->id);
-
-        try {
-            $stmt->execute();
-            $this->message = "Senha atualizada com sucesso!";
-            return true;
-        } catch (PDOException $exception) {
-            $this->message = "Erro ao atualizar: {$exception->getMessage()}";
-            return false;
-        }
-    }
-    
-
-   public function updatePhoto(): bool
-{
-    $conn = Connect::getInstance();
-
-    // Buscar foto atual
-    $query = "SELECT photo FROM users WHERE id = :id";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":id", $this->id, \PDO::PARAM_INT);
-    $stmt->execute();
-
-    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-    // Se existir foto e o arquivo existir no disco, apagar
-    if (!empty($result["photo"])) {
-        $filePath = __DIR__ . "/../../" . $result["photo"];
-
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
+        $this->active = $active;
     }
 
-    // Atualizar nova foto
-    $query = "UPDATE users 
-              SET photo = :photo 
-              WHERE id = :id";
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
 
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":photo", $this->photo);
-    $stmt->bindParam(":id", $this->id, \PDO::PARAM_INT);
+    /**
+     * O e-mail é conferido aqui antes do INSERT, mas quem garante a unicidade é o
+     * índice `uq_users_email` (migration 003): entre a checagem e a gravação cabe
+     * outra requisição com o mesmo e-mail. Quando isso acontece, o banco recusa e
+     * a violação é traduzida na mesma mensagem da checagem — para o cliente da API
+     * o resultado é idêntico, com ou sem concorrência.
+     */
+    public function insert (): bool
+    {
+        if($this->emailInUse((string)$this->email)){
+            $this->errorMessage = "E-mail já cadastrado";
+            $this->emailConflict = true;
+            return false;
+        }
 
-    try {
-        $stmt->execute();
-        $this->message = "Foto atualizada com sucesso!";
+        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+
+        if(!parent::insert()){
+            if($this->isDuplicateEntry()){
+                $this->errorMessage = "E-mail já cadastrado";
+                $this->emailConflict = true;
+                return false;
+            }
+
+            // A mensagem do banco é preservada: trocá-la por um texto genérico
+            // escondia a causa real de qualquer falha de gravação.
+            return false;
+        }
+
         return true;
-    } catch (PDOException $exception) {
-        $this->message = "Erro ao atualizar: {$exception->getMessage()}";
-        return false;
     }
-}
+
+    /** true quando a última falha foi e-mail repetido, e não erro de banco. */
+    public function hasEmailConflict (): bool
+    {
+        return $this->emailConflict;
+    }
+
+    public function login (string $email, string $password, int $typeId = 2): bool
+    {
+        $query = "SELECT * FROM {$this->table} WHERE email = :email AND type_id = :typeId AND active = 1";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":typeId", $typeId);
+        $stmt->execute();
+        if($stmt->rowCount() == 0){
+            $this->errorMessage = "Email não cadastrado";
+            return false;
+        }
+        $user = $stmt->fetch();
+        if(!password_verify($password, $user->password)){
+            $this->errorMessage = "Senha incorreta";
+            return false;
+        }
+        $this->id = $user->id;
+        $this->typeId = $user->type_id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->photo = $user->photo;
+        $this->active = (int)$user->active;
+        $jwt = new JWTToken();
+        // definir quais informações irão para o payload do token
+        $this->token = $jwt->encode([
+            "id" => $user->id,
+            "name" => $user->name,
+            "email" => $user->email,
+            "type_id" => $user->type_id
+        ]);
+        return true;
+    }
+
+    public function permissionVerify (string $email, $typeId): bool
+    {
+        $query = "SELECT * FROM {$this->table} WHERE email = :email AND type_id = :typeId AND active = 1";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":typeId", $typeId);
+        $stmt->execute();
+        if($stmt->rowCount() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public function updatePassword (int $id, string $password, string $newPassword): bool
+    {
+        $query = "SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $user = $stmt->fetch();
+        if(!$user){
+            $this->errorMessage = "Usuário não encontrado";
+            return false;
+        }
+
+        if(!password_verify($password, $user->password)){
+            $this->errorMessage = "Senha incorreta";
+            return false;
+        }
+
+        $this->password = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $query = "UPDATE {$this->table} SET password = :password WHERE {$this->primaryKey} = :id";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":password", $this->password);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return true;
+    }
+
+    // Remove do disco a foto atual antes de gravar a nova
+    public function replacePhoto (int $id, string $photo): bool
+    {
+        $query = "SELECT photo FROM {$this->table} WHERE {$this->primaryKey} = :id";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $current = $stmt->fetch();
+        if($current && !empty($current->photo)){
+            $filePath = __DIR__ . "/../../" . $current->photo;
+            if(file_exists($filePath)){
+                unlink($filePath);
+            }
+        }
+
+        $this->photo = $photo;
+
+        $query = "UPDATE {$this->table} SET photo = :photo WHERE {$this->primaryKey} = :id";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":photo", $photo);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return true;
+    }
+
+    /**
+     * Quantos usuários existem por perfil de acesso, separando ativos e inativos —
+     * alimenta o gráfico do dashboard administrativo.
+     *
+     * @return array<int, object{type_name: string, active: int, inactive: int}>
+     */
+    public function statsByType (): array
+    {
+        $query = "SELECT
+                    users_types.name AS type_name,
+                    SUM(CASE WHEN users.active = 1 THEN 1 ELSE 0 END) AS active,
+                    SUM(CASE WHEN users.active = 0 THEN 1 ELSE 0 END) AS inactive
+                  FROM users_types
+                  LEFT JOIN users ON users.type_id = users_types.id
+                  GROUP BY users_types.id, users_types.name
+                  ORDER BY users_types.id ASC";
+
+        $stmt = Connect::getInstance()->query($query);
+
+        return $stmt->fetchAll();
+    }
+
+    /** Usuários com o nome do perfil, para o relatório em PDF. */
+    public function selectAllForReport (): array
+    {
+        $query = "SELECT
+                    users.id,
+                    users.name,
+                    users.email,
+                    users.active,
+                    users_types.name AS type_name
+                  FROM users
+                  INNER JOIN users_types ON users_types.id = users.type_id
+                  ORDER BY users_types.id ASC, users.name ASC";
+
+        $stmt = Connect::getInstance()->query($query);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Localiza um usuário ativo pelo e-mail. Usado pelo fluxo de recuperação de
+     * senha, que parte só do e-mail informado no formulário público.
+     */
+    public function selectActiveByEmail (string $email): bool
+    {
+        $query = "SELECT * FROM {$this->table} WHERE email = :email AND active = 1 LIMIT 1";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":email", $email);
+        $stmt->execute();
+
+        $user = $stmt->fetch();
+        if(!$user){
+            $this->errorMessage = "E-mail não cadastrado";
+            return false;
+        }
+
+        $this->id = (int)$user->id;
+        $this->typeId = (int)$user->type_id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->photo = $user->photo;
+        $this->active = (int)$user->active;
+
+        return true;
+    }
+
+    /**
+     * Grava uma senha nova sem exigir a anterior — é o que o link de recuperação
+     * enviado por e-mail autoriza, já que quem chega aqui não sabe a senha antiga.
+     * A posse do token é validada antes, em Source\Models\PasswordReset.
+     */
+    public function resetPassword (int $id, string $newPassword): bool
+    {
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $query = "UPDATE {$this->table} SET password = :password WHERE {$this->primaryKey} = :id";
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":password", $hash);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        if($stmt->rowCount() < 1){
+            $this->errorMessage = "Não foi possível atualizar a senha.";
+            return false;
+        }
+
+        $this->password = $hash;
+
+        return true;
+    }
+
+    // O e-mail é único, portanto precisa ser checado contra os demais registros
+    public function emailInUse (string $email, ?int $ignoreId = null): bool
+    {
+        $query = "SELECT id FROM {$this->table} WHERE email = :email";
+        if($ignoreId !== null){
+            $query .= " AND {$this->primaryKey} != :id";
+        }
+
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":email", $email);
+        if($ignoreId !== null){
+            $stmt->bindValue(":id", $ignoreId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
 }

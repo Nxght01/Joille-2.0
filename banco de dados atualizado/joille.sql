@@ -1,299 +1,277 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
+-- ---------------------------------------------------------------------------
+-- Banco de dados JOILLE — dump completo
 --
--- Host: 127.0.0.1
--- Tempo de geração: 18/12/2025 às 19:45
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+-- Gerado a partir do banco local já com TODAS as migrations aplicadas:
+--   001 — paridade com o padrão acme (users_types, type_id, active, types)
+--   002 — service_images, password_resets e ajustes em contacts
+--   003 — UNIQUE em users.email, índices de busca e COMMENT nas tabelas
+--
+-- Importar este arquivo é o caminho mais simples: ele já traz a estrutura final,
+-- os índices, os comentários e os dados de referência (perfis de acesso, tipos de
+-- FAQ, categorias e o usuário administrador).
+--
+--   mysql -u root < "banco de dados atualizado/joille.sql"
+--
+-- Quem JÁ tem o banco `joille` criado não deve reimportar: rode apenas as
+-- migrations que ainda faltam, na ordem numérica.
+--
+-- Administrador inicial: admin@joille.com / admin@123  (troque após o 1º login)
+--
+-- MySQL Workbench: para abrir o modelo ER atualizado use
+-- Database > Reverse Engineer e aponte para o banco `joille`. Os COMMENT das
+-- tabelas e colunas aparecem no diagrama. Detalhes em README.md desta pasta.
+-- ---------------------------------------------------------------------------
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Banco de dados: `joille`
---
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `joille` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `categories`
---
-
+USE `joille`;
+DROP TABLE IF EXISTS `categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL COMMENT 'Nome da categoria. Unico entre os registros ATIVOS (regra na aplicacao).',
+  `active` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Exclusao logica: 1 = ativo, 0 = inativo. Inativa nao aparece na area publica.',
+  PRIMARY KEY (`id`),
+  KEY `idx_categories_name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COMMENT='Categorias dos servicos do catalogo (ex.: Basico, Intermediario, Avancado).';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Despejando dados para a tabela `categories`
---
-
-INSERT INTO `categories` (`id`, `name`) VALUES
-(1, 'Basico'),
-(2, 'Intermediário'),
-(3, 'Avançado');
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `contacts`
---
-
+LOCK TABLES `categories` WRITE;
+/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+INSERT INTO `categories` VALUES (1,'Basico',1),(2,'Intermediário',1),(3,'Avançado',1);
+/*!40000 ALTER TABLE `categories` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `contacts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `contacts` (
-  `id` int(11) NOT NULL,
-  `users_id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `users_id` int DEFAULT NULL,
   `contactEmaill` varchar(255) DEFAULT NULL,
   `contactName` varchar(255) DEFAULT NULL,
-  `message` mediumtext DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `subject` varchar(255) DEFAULT NULL,
+  `message` mediumtext,
+  `answered` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_contact_users_idx` (`users_id`),
+  CONSTRAINT `fk_contact_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+LOCK TABLES `contacts` WRITE;
+/*!40000 ALTER TABLE `contacts` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contacts` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `password_resets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_resets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `users_id` int NOT NULL,
+  `token` char(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `used_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_password_resets_token` (`token`),
+  KEY `fk_password_resets_users_idx` (`users_id`),
+  CONSTRAINT `fk_password_resets_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Estrutura para tabela `payments`
---
-
+LOCK TABLES `password_resets` WRITE;
+/*!40000 ALTER TABLE `password_resets` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_resets` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `payments` (
-  `id` int(11) NOT NULL,
-  `price` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `price` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `questions`
---
-
+LOCK TABLES `payments` WRITE;
+/*!40000 ALTER TABLE `payments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `payments` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `questions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `questions` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `types_id` int NOT NULL DEFAULT '1',
   `question` varchar(255) NOT NULL,
   `answer` mediumtext NOT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `fk_questions_types_idx` (`types_id`),
+  CONSTRAINT `fk_questions_types` FOREIGN KEY (`types_id`) REFERENCES `types` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Despejando dados para a tabela `questions`
---
+LOCK TABLES `questions` WRITE;
+/*!40000 ALTER TABLE `questions` DISABLE KEYS */;
+INSERT INTO `questions` VALUES (1,1,'O que é o sistema Joille?','O Joille é um sistema de gerenciamento desenvolvido para empresas de pequeno porte dos ramos de joalheria e bijuteria, com foco em organização e praticidade.','2025-12-17 21:41:57',1),(2,1,'Para quem o sistema é indicado?','O sistema é indicado para pequenos empreendedores que buscam uma solução simples e eficiente para gerenciar seus serviços.','2025-12-17 21:41:57',1),(3,1,'Preciso instalar algum programa para usar o Joille?','Não. O Joille é um sistema online e pode ser acessado diretamente pelo navegador.','2025-12-17 21:41:57',1),(4,1,'O sistema funciona em celulares e tablets?','Sim. O Joille é responsivo e pode ser utilizado em computadores, tablets e smartphones.','2025-12-17 21:41:57',1),(5,1,'Meus dados ficam seguros no sistema?','Sim. O sistema utiliza boas práticas de segurança para proteger os dados dos usuários.','2025-12-17 21:41:57',1),(6,1,'Como posso entrar em contato com a equipe?','Você pode utilizar a aba Contato disponível no site ou entrar em contato pelas redes sociais.','2025-12-17 21:41:57',1);
+/*!40000 ALTER TABLE `questions` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `service_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `service_images` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `services_id` int NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `caption` varchar(255) DEFAULT NULL,
+  `cover` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_service_images_services_idx` (`services_id`),
+  CONSTRAINT `fk_service_images_services` FOREIGN KEY (`services_id`) REFERENCES `services` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `questions` (`id`, `question`, `answer`, `created_at`) VALUES
-(1, 'O que é o sistema Joille?', 'O Joille é um sistema de gerenciamento desenvolvido para empresas de pequeno porte dos ramos de joalheria e bijuteria, com foco em organização e praticidade.', '2025-12-17 21:41:57'),
-(2, 'Para quem o sistema é indicado?', 'O sistema é indicado para pequenos empreendedores que buscam uma solução simples e eficiente para gerenciar seus serviços.', '2025-12-17 21:41:57'),
-(3, 'Preciso instalar algum programa para usar o Joille?', 'Não. O Joille é um sistema online e pode ser acessado diretamente pelo navegador.', '2025-12-17 21:41:57'),
-(4, 'O sistema funciona em celulares e tablets?', 'Sim. O Joille é responsivo e pode ser utilizado em computadores, tablets e smartphones.', '2025-12-17 21:41:57'),
-(5, 'Meus dados ficam seguros no sistema?', 'Sim. O sistema utiliza boas práticas de segurança para proteger os dados dos usuários.', '2025-12-17 21:41:57'),
-(6, 'Como posso entrar em contato com a equipe?', 'Você pode utilizar a aba Contato disponível no site ou entrar em contato pelas redes sociais.', '2025-12-17 21:41:57');
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `services`
---
-
+LOCK TABLES `service_images` WRITE;
+/*!40000 ALTER TABLE `service_images` DISABLE KEYS */;
+/*!40000 ALTER TABLE `service_images` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `services` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   `value` varchar(15) DEFAULT NULL,
-  `categories_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `categories_id` int NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `fk_services_categories1_idx` (`categories_id`),
+  KEY `idx_services_name` (`name`),
+  CONSTRAINT `fk_services_categories1` FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Despejando dados para a tabela `services`
---
-
-INSERT INTO `services` (`id`, `name`, `description`, `value`, `categories_id`) VALUES
-(4, 'D29 Estética', 'Arranhões tirados por Ariel Moreira, desertor do IFSUL', '300000', 1),
-(7, 'D29 Estética 3', 'siena do Brenan', '1550', 3),
-(8, 'teste ', 'teste para a apresentação', '15000', 2);
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `status`
---
-
+LOCK TABLES `services` WRITE;
+/*!40000 ALTER TABLE `services` DISABLE KEYS */;
+INSERT INTO `services` VALUES (1,'Polimento','Polimento de joias','150',1,1);
+/*!40000 ALTER TABLE `services` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `status` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `details` varchar(255) DEFAULT NULL,
   `endDate` varchar(255) DEFAULT NULL,
-  `startDate` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `startDate` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+LOCK TABLES `status` WRITE;
+/*!40000 ALTER TABLE `status` DISABLE KEYS */;
+/*!40000 ALTER TABLE `status` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `types` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `description` varchar(255) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Estrutura para tabela `users`
---
-
+LOCK TABLES `types` WRITE;
+/*!40000 ALTER TABLE `types` DISABLE KEYS */;
+INSERT INTO `types` VALUES (1,'Geral',1),(2,'Conta e Acesso',1),(3,'Serviços',1);
+/*!40000 ALTER TABLE `types` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `status_id` int(11) DEFAULT NULL,
-  `services_id` int(11) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `photo` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type_id` int NOT NULL DEFAULT '2' COMMENT 'Perfil de acesso (users_types). 1 = ADMIN, 2 = CLIENT.',
+  `status_id` int DEFAULT NULL COMMENT 'Reservado: vinculo opcional com status. Nao utilizado pela aplicacao.',
+  `services_id` int DEFAULT NULL COMMENT 'Reservado: vinculo opcional com services. Nao utilizado pela aplicacao.',
+  `name` varchar(255) NOT NULL COMMENT 'Nome completo informado no cadastro.',
+  `email` varchar(255) NOT NULL COMMENT 'E-mail de login. UNICO (uq_users_email) e comparado sem diferenciar maiusculas.',
+  `password` varchar(255) NOT NULL COMMENT 'Hash gerado por password_hash(). NUNCA a senha em texto puro.',
+  `photo` varchar(255) DEFAULT NULL COMMENT 'Caminho relativo da foto de perfil, ex.: uploads/images/2026/08/arquivo.jpg.',
+  `active` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Exclusao logica: 1 = ativo, 0 = inativo. Inativo nao consegue autenticar.',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_users_email` (`email`),
+  KEY `fk_users_status1_idx` (`status_id`),
+  KEY `fk_users_services1_idx` (`services_id`),
+  KEY `fk_users_users_types_idx` (`type_id`),
+  CONSTRAINT `fk_users_services1` FOREIGN KEY (`services_id`) REFERENCES `services` (`id`),
+  CONSTRAINT `fk_users_status1` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`),
+  CONSTRAINT `fk_users_users_types` FOREIGN KEY (`type_id`) REFERENCES `users_types` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb3 COMMENT='Contas do sistema: administradores e clientes, separados por type_id.';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Despejando dados para a tabela `users`
---
-
-INSERT INTO `users` (`id`, `status_id`, `services_id`, `name`, `email`, `password`, `photo`) VALUES
-(21, NULL, NULL, 'antonio', 'antonio@gmail.com', '$2y$10$14V.qO6ohHIGGq3GEeaHJ.goCYdrM6EtEHMfddaAMk1GuhXu/Yr..', 'uploads/images/2025/12/1c8fdfc18d634b9b0d8000638906bc0469444a6ad48f0.jpg'),
-(25, NULL, NULL, 'eliasaaa', 'elias@gmail.com', '$2y$10$53rTFDeBUiiWjDMVCTv9nunH89X2SF2YzDS0soyBjDAQ/NOS3kAfW', 'uploads/images/2025/12/63327ead831a117b5faab1ade0e99d7769444a554df39.jpg');
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `users_categories`
---
-
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (26,1,NULL,NULL,'Administrador','admin@joille.com','$2y$10$P9F7N0FLcGIKoAvyqEilJeWUrli1UC9ZRC0SjqNPNyqMugtMvH27i',NULL,1);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `users_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users_categories` (
-  `id` int(11) NOT NULL,
-  `type` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Índices para tabelas despejadas
---
+LOCK TABLES `users_categories` WRITE;
+/*!40000 ALTER TABLE `users_categories` DISABLE KEYS */;
+/*!40000 ALTER TABLE `users_categories` ENABLE KEYS */;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `users_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users_types` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL COMMENT 'Nome do perfil: ADMIN ou CLIENT. Usado por Api::authToken().',
+  `active` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Exclusao logica: 1 = ativo, 0 = inativo.',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3 COMMENT='Perfis de acesso. 1 = ADMIN (painel administrativo), 2 = CLIENT (area do cliente).';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Índices de tabela `categories`
---
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`);
+LOCK TABLES `users_types` WRITE;
+/*!40000 ALTER TABLE `users_types` DISABLE KEYS */;
+INSERT INTO `users_types` VALUES (1,'ADMIN',1),(2,'CLIENT',1);
+/*!40000 ALTER TABLE `users_types` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
---
--- Índices de tabela `contacts`
---
-ALTER TABLE `contacts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_contact_users_idx` (`users_id`);
-
---
--- Índices de tabela `payments`
---
-ALTER TABLE `payments`
-  ADD PRIMARY KEY (`id`);
-
---
--- Índices de tabela `questions`
---
-ALTER TABLE `questions`
-  ADD PRIMARY KEY (`id`);
-
---
--- Índices de tabela `services`
---
-ALTER TABLE `services`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_services_categories1_idx` (`categories_id`);
-
---
--- Índices de tabela `status`
---
-ALTER TABLE `status`
-  ADD PRIMARY KEY (`id`);
-
---
--- Índices de tabela `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_users_status1_idx` (`status_id`),
-  ADD KEY `fk_users_services1_idx` (`services_id`);
-
---
--- Índices de tabela `users_categories`
---
-ALTER TABLE `users_categories`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT para tabelas despejadas
---
-
---
--- AUTO_INCREMENT de tabela `categories`
---
-ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT de tabela `contacts`
---
-ALTER TABLE `contacts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `payments`
---
-ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `questions`
---
-ALTER TABLE `questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT de tabela `services`
---
-ALTER TABLE `services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT de tabela `status`
---
-ALTER TABLE `status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT de tabela `users_categories`
---
-ALTER TABLE `users_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Restrições para tabelas despejadas
---
-
---
--- Restrições para tabelas `contacts`
---
-ALTER TABLE `contacts`
-  ADD CONSTRAINT `fk_contact_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`);
-
---
--- Restrições para tabelas `services`
---
-ALTER TABLE `services`
-  ADD CONSTRAINT `fk_services_categories1` FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`);
-
---
--- Restrições para tabelas `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `fk_users_services1` FOREIGN KEY (`services_id`) REFERENCES `services` (`id`),
-  ADD CONSTRAINT `fk_users_status1` FOREIGN KEY (`status_id`) REFERENCES `status` (`id`);
-COMMIT;
-
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+

@@ -1,26 +1,28 @@
 <?php
 
 namespace Source\Models;
-use Source\Core\Connect;
 
+use PDO;
 use Source\Core\Model;
+use Source\Core\Connect;
 
 class Category extends Model
 {
-    private $id;
-    private $name;
-    private $message;
+    private ?int $id;
+    private ?string $name;
+    private ?int $active;
 
-    public function __construct(
-        int $id = null,
-        string $name = null,
-
-    ) {
+    public function __construct(?int $id = null, ?string $name = null, ?int $active = 1)
+    {
         $this->id = $id;
         $this->name = $name;
-        $this->entity = "categories";
+        $this->active = $active;
 
+        $this->table = 'categories'; // nome da tabela do banco
+        $this->primaryKey = 'id'; // nome da chave primária da tabela
+        $this->fillable = ['name', 'active']; // camelCase
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -41,131 +43,43 @@ class Category extends Model
         $this->name = $name;
     }
 
-    public function getMessage(): ?string
+    public function getActive(): ?int
     {
-        return $this->message;
+        return $this->active;
     }
 
-    public function insert(): ?int
+    public function setActive(int $active): void
     {
+        $this->active = $active;
+    }
 
-        $conn = Connect::getInstance();
-
-
-        $query = "SELECT * FROM categories WHERE name LIKE :name";
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":name", $this->name);
-        $stmt->execute();
-
-        if ($stmt->rowCount() == 1) {
-            $this->message = "Categoria já cadastrada!";
-            return false;
+    // O nome da categoria é único entre os registros ATIVOS: uma categoria inativada
+    // não deve impedir que o mesmo nome seja cadastrado de novo.
+    public function nameInUse(string $name, ?int $ignoreId = null): bool
+    {
+        $query = "SELECT id FROM {$this->table} WHERE name = :name AND active = 1";
+        if ($ignoreId !== null) {
+            $query .= " AND {$this->primaryKey} != :id";
         }
 
-        $query = "INSERT INTO categories (name) 
-                  VALUES (:name)";
-
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":name", $this->name);
-
-        try {
-            $stmt->execute();
-            return $conn->lastInsertId();
-        } catch (PDOException) {
-            $this->message = "Por favor, informe todos os campos";
-            return false;
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":name", $name);
+        if ($ignoreId !== null) {
+            $stmt->bindValue(":id", $ignoreId, PDO::PARAM_INT);
         }
-    }
-
-    public function deleteCategory(int $id): bool
-{
-
-    $conn = Connect::getInstance();
-
-    $checkQuery = "SELECT id FROM categories WHERE id = :id";
-    
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bindParam(":id", $id);
-    $checkStmt->execute();
-
-    if ($checkStmt->rowCount() === 0) {
-        $this->message = "Categoria não encontrada.";
-        return false;
-    }
-
-    $query = "DELETE FROM categories WHERE id = :id";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":id", $id);
-
-    try {
         $stmt->execute();
-        $this->message = "Categoria Excluida com sucesso ";
-        return true;
-    } catch (PDOException) {
-        $this->message = "Erro ao excluir a categoria: ";
-        return false;
+
+        return $stmt->rowCount() > 0;
     }
-}
 
-public function listCategory()
-{
-
-    $query = "SELECT * FROM categories";
-    $conn = Connect::getInstance();
-    $stmt = $conn->prepare($query);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
-
-    public function getCategoryById(int $id): array
+    // Impede a exclusão de uma categoria que ainda possui serviços ATIVOS vinculados.
+    // Serviços já inativados não bloqueiam a exclusão lógica da categoria.
+    public function hasServices(int $id): bool
     {
-        $query = "SELECT 
-                    categories.id, 
-                 categories.name
-                  FROM categories
-                  WHERE categories.id = :id";
-        $conn = Connect::getInstance();
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":id", $id);
+        $stmt = Connect::getInstance()->prepare("SELECT id FROM services WHERE categories_id = :id AND active = 1");
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll();
+
+        return $stmt->rowCount() > 0;
     }
-
-    public function updateService(): bool
-    {
-
-        $conn = Connect::getInstance();
-
-    $checkQuery = "SELECT name FROM categories WHERE name = :name";
-    
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bindParam(":name", $name);
-    $checkStmt->execute();
-
-    if ($checkStmt->rowCount() === 1) {
-        $this->message = "Nome já cadastrado.";
-        return false;
-    }
-
-        $query = "UPDATE categories 
-        SET categories.name = :name,
-        WHERE categories.id = :id";
-        $conn = Connect::getInstance();
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":id", $this->id);
-        $stmt->bindParam(":name", $this->name);
-       
-        
-        try {
-            $stmt->execute();
-            $this->message = "Categoria Atualizada com sucesso ";
-            return true;
-        } catch (PDOException) {
-            $this->message = "Erro ao Atualizar a categoria: ";
-            return false;
-        }
-    }
-
-
-
 }

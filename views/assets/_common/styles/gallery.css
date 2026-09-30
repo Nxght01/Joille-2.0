@@ -1,0 +1,168 @@
+/*
+ * Galeria de imagens da entidade principal (Etapa 07).
+ *
+ * Usada tanto pelo painel administrativo (com botões de capa e exclusão) como
+ * pela área pública (somente leitura).
+ *
+ * O `.modal` que envolve a galeria fica em `_common/styles/states.css`, que os
+ * três temas importam — aqui só o que é da galeria em si.
+ */
+
+/* A galeria pede um modal um pouco mais largo que o padrão */
+.modal-content:has(.gallery-grid) {
+    max-width: 640px;
+}
+
+/* --- seção de imagens no formulário do painel ---------------------------- */
+
+.gallery-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e6ded8;
+}
+
+.gallery-section h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #3d2c23;
+}
+
+.gallery-hint {
+    font-size: .82rem;
+    color: #7a6a60;
+    margin-bottom: 12px;
+}
+
+.gallery-upload {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.gallery-upload input[type="file"] {
+    flex: 1 1 220px;
+    min-width: 0;
+    font-size: .85rem;
+}
+
+.gallery-upload input[type="file"]:disabled,
+.gallery-upload button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* --- grade de miniaturas -------------------------------------------------- */
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+/* Os estados (carregando / vazio / erro) ocupam a linha inteira da grade */
+.gallery-grid .list-state {
+    grid-column: 1 / -1;
+}
+
+.gallery-item {
+    position: relative;
+    margin: 0;
+    border: 1px solid #e6ded8;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #faf8f6;
+}
+
+.gallery-item.is-cover {
+    border-color: #c9a227;
+    box-shadow: 0 0 0 2px rgba(201, 162, 39, .25);
+}
+
+.gallery-item img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.gallery-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: #c9a227;
+    color: #3d2c23;
+    font-size: .68rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 2px 7px;
+    border-radius: 10px;
+}
+
+.gallery-actions {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+}
+
+.gallery-actions .btn {
+    flex: 1;
+    padding: 5px 4px;
+    font-size: .72rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.gallery-actions .btn-cover {
+    background: #8c6a4f;
+    color: #fff;
+}
+
+.gallery-actions .btn-cover:disabled {
+    background: #d9cec6;
+    color: #7a6a60;
+    cursor: default;
+}
+
+.gallery-actions .btn-delete-image {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* --- miniatura na listagem administrativa -------------------------------- */
+
+.list-thumb {
+    display: block;
+    width: 52px;
+    height: 52px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.list-thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1ebe6;
+    color: #7a6a60;
+    font-size: .6rem;
+    text-align: center;
+    line-height: 1.1;
+}
+
+/* A listagem de serviços tem seis colunas: ID, capa, nome, categoria, nº de
+   imagens e ações. A linha é alcançada como irmã do cabeçalho porque as telas de
+   Serviços e de Mensagens compartilham `.services-container` / `.service-item`. */
+.list-header-services,
+.list-header-services ~ .services-container .service-item {
+    grid-template-columns: 60px 76px 1fr 1fr 90px 150px;
+}
+
+@media (max-width: 768px) {
+    .list-header-services ~ .services-container .service-item {
+        grid-template-columns: 1fr;
+    }
+}

@@ -2,36 +2,40 @@
 
 namespace Source\Models;
 
+use PDO;
 use PDOException;
-use Source\Core\Connect;
 use Source\Core\Model;
+use Source\Core\Connect;
 
 class Service extends Model
 {
-    private $id;
-    private $name;
-    private $description;
-    private $value;
-    private $categories_id;
-    private $message;
+    private ?int $id;
+    private ?int $categoriesId;
+    private ?string $name;
+    private ?string $description;
+    private ?string $value;
+    private ?int $active;
 
     public function __construct(
-        int $id = null,
-        string $name = null,
-        string $description = null,
-        int $value = null,
-        int $categories_id = null
-
-
+        ?int $id = null,
+        ?int $categoriesId = null,
+        ?string $name = null,
+        ?string $description = null,
+        ?string $value = null,
+        ?int $active = 1
     ) {
         $this->id = $id;
+        $this->categoriesId = $categoriesId;
         $this->name = $name;
         $this->description = $description;
         $this->value = $value;
-        $this->categories_id = $categories_id;
-        $this->entity = "services";
+        $this->active = $active;
 
+        $this->table = 'services'; // nome da tabela do banco
+        $this->primaryKey = 'id'; // nome da chave primária da tabela
+        $this->fillable = ['categoriesId', 'name', 'description', 'value', 'active']; // camelCase
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -40,6 +44,16 @@ class Service extends Model
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function getCategoriesId(): ?int
+    {
+        return $this->categoriesId;
+    }
+
+    public function setCategoriesId(int $categoriesId): void
+    {
+        $this->categoriesId = $categoriesId;
     }
 
     public function getName(): ?string
@@ -62,163 +76,191 @@ class Service extends Model
         $this->description = $description;
     }
 
-    public function getValue(): ?int 
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    public function setValue(int $value): void 
+    public function setValue(string $value): void
     {
         $this->value = $value;
     }
-    public function getCategories_id(): ?int 
+
+    public function getActive(): ?int
     {
-        return $this->categories_id;
+        return $this->active;
     }
 
-    public function setCategories_id(int $categories_id): void 
+    public function setActive(int $active): void
     {
-        $this->categories_id = $categories_id;
-    }
-    public function getMessage(): ?string
-    {
-        return $this->message;
+        $this->active = $active;
     }
 
-
-    public function insert(): ?int
+    // Listagem com o nome da categoria, usada pelo painel administrativo e pela área pública
+    public function selectAllWithCategory(array $filters = [], ?string $orderBy = 'services.id', string $direction = 'ASC'): array
     {
-
-        $conn = Connect::getInstance();
-
-
-        $query = "SELECT * FROM `services` WHERE name LIKE :name";
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":name", $this->name);
-        $stmt->execute();
-
-        if ($stmt->rowCount() == 1) {
-            $this->message = "Serviço já adicionado!";
-            return false;
-        }
-
-        $query = "INSERT INTO `services` (name,description,value,categories_id) 
-                  VALUES (:name,:description,:value,:categories_id)";
-
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":name", $this->name);
-        $stmt->bindParam(":description", $this->description);
-        $stmt->bindParam(":value", $this->value);
-        $stmt->bindParam(":categories_id", $this->categories_id);
-
         try {
+            $query = "SELECT
+                        services.id,
+                        services.categories_id,
+                        services.name,
+                        services.description,
+                        services.value,
+                        services.active,
+                        categories.name AS category_name,
+                        -- capa do serviço: a imagem marcada como cover ou, na falta
+                        -- dela, a mais antiga; e o total de imagens cadastradas
+                        (SELECT path FROM service_images
+                          WHERE service_images.services_id = services.id
+                          ORDER BY service_images.cover DESC, service_images.id ASC
+                          LIMIT 1) AS cover_image,
+                        (SELECT COUNT(*) FROM service_images
+                          WHERE service_images.services_id = services.id) AS images_count
+                      FROM services
+                      INNER JOIN categories ON services.categories_id = categories.id";
+
+            if (!empty($filters)) {
+                $query .= " WHERE ";
+                foreach ($filters as $index => $filter) {
+                    $query .= $filter;
+                    if ($index < count($filters) - 1) {
+                        $query .= " AND ";
+                    }
+                }
+            }
+
+            $query .= " ORDER BY {$orderBy} {$direction}";
+
+            $stmt = Connect::getInstance()->prepare($query);
             $stmt->execute();
-            return $conn->lastInsertId();
-        } catch (PDOException) {
-            $this->message = "Por favor, informe todos os campos";
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            $this->errorMessage = $e->getMessage();
+            return [];
+        }
+    }
+
+    public function selectByIdWithCategory(int $id): array | false
+    {
+        try {
+            $query = "SELECT
+                        services.id,
+                        services.categories_id,
+                        services.name,
+                        services.description,
+                        services.value,
+                        services.active,
+                        categories.name AS category_name,
+                        -- capa do serviço: a imagem marcada como cover ou, na falta
+                        -- dela, a mais antiga; e o total de imagens cadastradas
+                        (SELECT path FROM service_images
+                          WHERE service_images.services_id = services.id
+                          ORDER BY service_images.cover DESC, service_images.id ASC
+                          LIMIT 1) AS cover_image,
+                        (SELECT COUNT(*) FROM service_images
+                          WHERE service_images.services_id = services.id) AS images_count
+                      FROM services
+                      INNER JOIN categories ON services.categories_id = categories.id
+                      WHERE services.id = :id LIMIT 1";
+
+            $stmt = Connect::getInstance()->prepare($query);
+            $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $result = $stmt->fetch();
+            if (!$result) {
+                $this->errorMessage = "Serviço não encontrado.";
+                return false;
+            }
+
+            return (array)$result;
+        } catch (PDOException $e) {
+            $this->errorMessage = $e->getMessage();
             return false;
         }
     }
 
-    public function delete(int $id): bool
-{
-
-    $conn = Connect::getInstance();
-
-    $checkQuery = "SELECT id FROM services WHERE id = :id";
-    
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bindParam(":id", $id);
-    $checkStmt->execute();
-
-    if ($checkStmt->rowCount() === 0) {
-        $this->message = "Serviço não encontrado.";
-        return false;
-    }
-
-    $query = "DELETE FROM services WHERE id = :id";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":id", $id);
-
-    try {
-        $stmt->execute();
-        $this->message = "Serviço Excluido com sucesso ";
-        return true;
-    } catch (PDOException) {
-        $this->message = "Erro ao excluir o serviço: ";
-        return false;
-    }
-}
-
-public function listService()
+    /**
+     * Total de serviços e soma dos valores por categoria — alimenta o gráfico do
+     * dashboard e o relatório em PDF.
+     *
+     * Categorias sem nenhum serviço também aparecem (LEFT JOIN, total 0), para que
+     * o gráfico mostre onde falta cadastro.
+     *
+     * @return array<int, object{category_name: string, total: int, total_value: float}>
+     */
+    public function statsByCategory(bool $onlyActive = true): array
     {
+        try {
+            $condition = $onlyActive ? "AND services.active = 1" : "";
 
-        $query = "SELECT * FROM services";
-        $conn = Connect::getInstance();
-        $stmt = $conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll();
+            $query = "SELECT
+                        categories.id AS category_id,
+                        categories.name AS category_name,
+                        COUNT(services.id) AS total,
+                        COALESCE(SUM(CAST(services.value AS DECIMAL(12,2))), 0) AS total_value
+                      FROM categories
+                      LEFT JOIN services
+                        ON services.categories_id = categories.id {$condition}
+                      WHERE categories.active = 1
+                      GROUP BY categories.id, categories.name
+                      ORDER BY total DESC, categories.name ASC";
+
+            $stmt = Connect::getInstance()->query($query);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            $this->errorMessage = $e->getMessage();
+            return [];
+        }
     }
 
-    public function getServiceById(int $id): array
+    /**
+     * Serviços com o nome da categoria e a quantidade de imagens de cada um,
+     * usado no relatório de catálogo em PDF.
+     */
+    public function selectAllForReport(bool $onlyActive = false): array
     {
-       $query = "SELECT 
-            services.id, 
-            services.name,
-            services.value,
-            services.description,
-            services.categories_id,
-            categories.name as category_name  /* Added to show you can select from categories table */
-          FROM services
-          INNER JOIN categories ON services.categories_id = categories.id
-          WHERE services.id = :id";
-        $conn = Connect::getInstance();
-        $stmt = $conn->prepare($query);
-        $stmt->bindParam(":id", $id);
+        try {
+            $condition = $onlyActive ? "WHERE services.active = 1" : "";
+
+            $query = "SELECT
+                        services.id,
+                        services.name,
+                        services.description,
+                        services.value,
+                        services.active,
+                        categories.name AS category_name,
+                        (SELECT COUNT(*) FROM service_images
+                          WHERE service_images.services_id = services.id) AS images
+                      FROM services
+                      INNER JOIN categories ON services.categories_id = categories.id
+                      {$condition}
+                      ORDER BY categories.name ASC, services.name ASC";
+
+            $stmt = Connect::getInstance()->query($query);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            $this->errorMessage = $e->getMessage();
+            return [];
+        }
+    }
+
+    // O nome do serviço é único entre os registros ATIVOS: um serviço inativado
+    // não deve impedir que o mesmo nome seja cadastrado de novo.
+    public function nameInUse(string $name, ?int $ignoreId = null): bool
+    {
+        $query = "SELECT id FROM {$this->table} WHERE name = :name AND active = 1";
+        if ($ignoreId !== null) {
+            $query .= " AND {$this->primaryKey} != :id";
+        }
+
+        $stmt = Connect::getInstance()->prepare($query);
+        $stmt->bindValue(":name", $name);
+        if ($ignoreId !== null) {
+            $stmt->bindValue(":id", $ignoreId, PDO::PARAM_INT);
+        }
         $stmt->execute();
-        return $stmt->fetchAll();
+
+        return $stmt->rowCount() > 0;
     }
-
-    public function updateService(): bool
-{
-    $conn = Connect::getInstance();
-
-    $checkQuery = "SELECT name FROM services WHERE name = :name AND id != :id"; // Added id check to avoid conflict with current record
-    
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bindParam(":name", $this->name);
-    $checkStmt->bindParam(":id", $this->id);
-    $checkStmt->execute();
-
-    if ($checkStmt->rowCount() === 1) {
-        $this->message = "Nome já cadastrado.";
-        return false;
-    }
-
-    $query = "UPDATE services 
-        SET services.name = :name,
-            services.description = :description,
-            services.value = :value,
-            services.categories_id = :categories_id
-        WHERE services.id = :id"; // Removed trailing comma
-
-    $conn = Connect::getInstance();
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(":id", $this->id);
-    $stmt->bindParam(":name", $this->name);
-    $stmt->bindParam(":description", $this->description);
-    $stmt->bindParam(":value", $this->value);
-    $stmt->bindParam(":categories_id", $this->categories_id);
-    
-    try {
-        $stmt->execute();
-        $this->message = "Serviço Atualizado com sucesso";
-        return true;
-    } catch (PDOException $e) { // Added exception variable
-        $this->message = "Erro ao Atualizar o serviço: " . $e->getMessage();
-        return false;
-    }
-}
-
-
 }

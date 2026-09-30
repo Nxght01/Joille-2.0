@@ -1,0 +1,58 @@
+.login-container{
+    width: 50%;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.form-group{
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+button {
+    background-color: #2C3E50;
+    color: #fff;
+    cursor: pointer;
+    padding: 5px;
+    border: none;
+    border-radius: 5px ;
+}
+button:hover {
+    background-color: #0056b3;
+}
+/* Texto de apoio das telas de login, cadastro e recuperação de senha */
+.form-hint {
+    font-size: .86rem;
+    color: #5b6b78;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.login-container a {
+    display: block;
+    margin-top: 8px;
+    font-size: .86rem;
+    color: #2C3E50;
+}
+
+.login-container button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    font-size: .95rem;
+}
+
+.login-container button:disabled {
+    background-color: #9aa7b1;
+    cursor: progress;
+}

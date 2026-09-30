@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+/* `body > header` e não `header`: as telas de CRUD usam um <header> próprio para
+   o título e a barra de busca, e o seletor de elemento pintava esse bloco com o
+   fundo escuro da barra do topo. */
+body > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #35424a;
+    color: #ffffff;
+    padding: 10px 20px;
+    text-align: center;
+}
+nav {
+    display: flex;
+    justify-content: center;
+    background: #35424a;
+}
+nav a {
+    color: #ffffff;
+    padding: 14px 20px;
+    text-decoration: none;
+    text-align: center;
+}
+nav a:hover {
+    background: #45a049;
+}
+.container {
+    padding: 20px;
+}
+.card {
+    background: white;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+/* Avatar do administrador, limitado ao cabeçalho principal. */
+body > header .admin-greeting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#imageAdmin {
+    display: block;
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #eef2f5;
+}

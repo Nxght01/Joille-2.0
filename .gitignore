@@ -1,2 +1,21 @@
 /.idea
+
+# Nota: /vendor já está versionado neste repositório, então NÃO é ignorado aqui.
+# Com o composer.lock presente, o normal seria ignorá-lo e rodar `composer install`
+# no destino — se optarem por isso, será preciso um `git rm -r --cached vendor`.
+
+# Imagens enviadas pelos usuários (fotos de perfil e imagens dos serviços).
+# Recomendado pelo enunciado da Etapa 07: arquivos de upload não são versionados.
 /uploads/
+
+# E-mails capturados pelo modo de teste (CONF_MAIL_MODE = "capture").
+# A caixa de entrada local (storage/mail/index.php) continua versionada.
+/storage/mail/*.html
+
+# Saídas dos scripts de teste
+/api-test-ctx.json
+
+# Configuração e cópias do banco exclusivas desta instalação.
+/source/Config/Config.php
+/banco de dados atualizado/backup-*.sql
+/banco de dados atualizado/*.local.sql

@@ -19,6 +19,8 @@ $route->get("/services","Web:services");
 $route->get("/faqs","Web:faqs");
 $route->get("/login","Web:login");
 $route->get("/cadastro","Web:cadastro");
+$route->get("/esqueci-senha","Web:forgotPassword");
+$route->get("/redefinir-senha","Web:resetPassword");
 
 // Rotas amigáveis da área restrita
 $route->group("/app");
@@ -34,11 +36,13 @@ $route->group(null);
 $route->group("/admin");
 
 $route->get("/", "Admin:home");
+$route->get("/login", "Admin:login");
 $route->get("/cadastro-produtos", "Admin:products");
 $route->get("/editar-usuario", "Admin:editUser");
-$route->get("/editar-serviços", "Admin:editServices");
+$route->get("/editar-servicos", "Admin:editServices");
 $route->get("/editar-categoria", "Admin:editCategory");
-$route->get("/editar-pedidos", "Admin:editOrders");
+$route->get("/editar-faqs", "Admin:editFaqs");
+$route->get("/mensagens", "Admin:contacts");
 
 $route->group(null);
 

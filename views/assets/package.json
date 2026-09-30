@@ -1,0 +1,6 @@
+{
+  "name": "joille-assets",
+  "private": true,
+  "type": "module",
+  "description": "Marca os arquivos .js desta pasta como ES Modules para que o Node consiga executar o poo-test.mjs. O navegador já os carrega como módulo via <script type=\"module\">."
+}

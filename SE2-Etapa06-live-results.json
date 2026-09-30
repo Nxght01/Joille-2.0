@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-24T18:24:41.445Z",
+  "run": "AUDIT06-1790274280541",
+  "created": [
+    {
+      "resource": "categories",
+      "id": 53
+    },
+    {
+      "resource": "services",
+      "id": 49
+    },
+    {
+      "resource": "questions",
+      "id": 34
+    },
+    {
+      "resource": "users",
+      "id": 85
+    }
+  ],
+  "evidence": [
+    "Admin POST login returns User and token",
+    "Category POST persists entity",
+    "Category PUT succeeds",
+    "Category GET reads edited data",
+    "Category list includes created entity",
+    "Service POST and GET accept zero price",
+    "Service PUT succeeds",
+    "Service GET reads edited value and name",
+    "Service PUT accepts zero price",
+    "Service GET confirms price changed back to zero",
+    "Service category list contains entity",
+    "Category with active service cannot be deleted",
+    "FAQ POST and GET persist entity",
+    "FAQ PUT succeeds",
+    "FAQ GET reads edited answer",
+    "FAQ list includes entity",
+    "Public registration returns client User",
+    "Customer POST login succeeds",
+    "Authenticated profile loads",
+    "Profile PUT succeeds",
+    "Profile GET reads edited name",
+    "Client cannot write admin categories",
+    "FAQ DELETE succeeds",
+    "FAQ deletion persisted as inactive",
+    "Service DELETE succeeds",
+    "Service deletion persisted as inactive",
+    "Category DELETE succeeds",
+    "Category deletion persisted as inactive",
+    "User DELETE succeeds",
+    "User deletion persisted as inactive",
+    "Public service list omits deleted record",
+    "Public category list omits deleted record",
+    "Public FAQ list omits deleted record",
+    "PASS exact-ID database cleanup"
+  ],
+  "success": true
+}

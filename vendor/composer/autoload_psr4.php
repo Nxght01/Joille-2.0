@@ -6,9 +6,15 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Svg\\' => array($vendorDir . '/dompdf/php-svg-lib/src/Svg'),
     'Source\\' => array($baseDir . '/source'),
+    'Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),
+    'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
+    'Masterminds\\' => array($vendorDir . '/masterminds/html5/src'),
     'League\\Plates\\' => array($vendorDir . '/league/plates/src'),
+    'FontLib\\' => array($vendorDir . '/dompdf/php-font-lib/src/FontLib'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
+    'Dompdf\\' => array($vendorDir . '/dompdf/dompdf/src'),
     'CoffeeCode\\Uploader\\' => array($vendorDir . '/coffeecode/uploader/src'),
     'CoffeeCode\\Router\\' => array($vendorDir . '/coffeecode/router/src'),
 );

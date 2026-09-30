@@ -15,21 +15,43 @@ class Admin
 
     public function home ()
     {
-        
         echo $this->view->render("home",[]);
     }
 
-    public function products () {
+    public function login ()
+    {
+        echo $this->view->render("login",[]);
+    }
+
+    public function products ()
+    {
         echo $this->view->render("products",[]);
     }
-    public function editUser () {
+
+    public function editUser ()
+    {
         echo $this->view->render("editUser",[]);
     }
-    public function editServices () {
+
+    public function editServices ()
+    {
         echo $this->view->render("editServices",[]);
     }
-    public function editCategory () {
+
+    public function editCategory ()
+    {
         echo $this->view->render("editCategory",[]);
+    }
+
+    public function editFaqs ()
+    {
+        echo $this->view->render("editFaqs",[]);
+    }
+
+    /** Mensagens recebidas pelo formulário de contato da área pública. */
+    public function contacts ()
+    {
+        echo $this->view->render("contacts",[]);
     }
 
 }

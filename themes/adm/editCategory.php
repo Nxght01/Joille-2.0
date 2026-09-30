@@ -2,118 +2,49 @@
 $this->layout("_theme");
 ?>
 
+<?php $this->start("specific-style"); ?>
+<link rel="stylesheet" href="<?= url("views/assets/admin/styles/crud.css"); ?>">
+<?php $this->end(); ?>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Usuário</title>
-    <link rel="stylesheet" href="<?= url("assets/css/adm/editCategory.css"); ?>">
-    <script type="module" src="<?= url('assets/js/adm/edit_category.js'); ?>" async></script>
-    </head>
-<body>
+<?php $this->start("specific-script"); ?>
+<script type="module" src="<?= url("views/assets/admin/scripts/edit_category.js"); ?>"></script>
+<?php $this->end(); ?>
 
 <header>
-    <h1>Editar Usuário</h1>
+    <h1>Administração de Categorias</h1>
+    <section class="toolbar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar pelo nome da categoria...">
+        <button type="button" class="btn btn-new" id="btnNew">+ Nova Categoria</button>
+    </section>
 </header>
 
-<div class="container">
-    <section class="card">
-        <h2>Dados do Usuário</h2>
-        <form id="edit-form">
-            <label for="userId">ID do Usuário:</label>
-            <input type="text" id="userId" name="userId" required>
-            <br>
-            <label for="username">Nome de Usuário:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <br>
-            <button type="submit">Salvar</button>
-            <button type="button" id="cancel-btn">Cancelar</button>
-        </form>
+<section class="categories-list">
+    <header class="list-header list-header-categories">
+        <span>ID</span>
+        <span>Nome</span>
+        <span>Ações</span>
+    </header>
+    <section class="categories-container" id="categoriesList">
+        <!-- Categorias inseridas dinamicamente aqui -->
     </section>
-</div>
+</section>
 
-<header>
-    <h1>editar Serviço</h1>
-</header>
+<section id="editModal" class="modal">
+    <article class="modal-content">
+        <h2 id="modalTitle">Edição de Categoria</h2>
+        <form id="editForm">
+            <input type="hidden" id="id" name="id">
+            <input type="hidden" id="active" name="active">
 
-<div class="container">
-    <section class="card">
-        <h2>editar dados do serviço</h2>
-        <form id="edit-form">
-            <label for="userId">ID do Usuário:</label>
-            <input type="text" id="userId" name="userId" required>
-            <br>
-            <label for="username">Nome de Usuário:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="type">Tipo do Serviço:</label>
-            <input type="text" id="type" name="type" required>
-            <br>
-            <label for="value">Valor Atribuído:</label>
-            <input type="text" id="value" name="value" required>
-            <br>
-            <button type="submit" id="add-btn">Salvar</button>
-            <button type="button" id="cancel-btn">Cancelar</button>
+            <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-save">Salvar</button>
+                <button type="button" class="btn btn-cancel">Cancelar</button>
+            </div>
         </form>
-    </section>
-</div>
-
-<header>
-    <h1>deletar Serviço</h1>
-</header>
-
-<div class="container">
-    <section class="card">
-        <h2>deletar dados do serviço</h2>
-        <form id="edit-form">
-            <label for="userId">ID do Usuário:</label>
-            <input type="text" id="userId" name="userId" required>
-            <br>
-            <label for="username">Nome de Usuário:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="type">Tipo do Serviço:</label>
-            <input type="text" id="type" name="type" required>
-            <br>
-            <label for="value">Valor Atribuído:</label>
-            <input type="text" id="value" name="value" required>
-            <br>
-            <button type="submit" id="add-btn">Salvar</button>
-            <button type="button" id="cancel-btn">Cancelar</button>
-        </form>
-    </section>
-</div>
-
-<header>
-    <h1>encontrar Serviço por ID</h1>
-</header>
-
-<div class="container">
-    <section class="card">
-        <h2>coloque os dados do serviço</h2>
-        <form id="edit-form">
-            <label for="userId">ID do Usuário:</label>
-            <input type="text" id="userId" name="userId" required>
-            <br>
-            <label for="username">Nome de Usuário:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="type">Tipo do Serviço:</label>
-            <input type="text" id="type" name="type" required>
-            <br>
-            <label for="value">Valor Atribuído:</label>
-            <input type="text" id="value" name="value" required>
-            <br>
-            <button type="submit" id="add-btn">Salvar</button>
-            <button type="button" id="cancel-btn">Cancelar</button>
-        </form>
-    </section>
-</div>
-
-</body>
-</html>
+    </article>
+</section>

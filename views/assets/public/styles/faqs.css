@@ -1,0 +1,324 @@
+/*
+ * Perguntas frequentes — sanfona da área pública.
+ *
+ * Folha pensada para CONFORTO DE LEITURA. As decisões que importam:
+ *
+ *   - a coluna de texto é limitada em `ch` (largura de caractere), não em pixels:
+ *     60ch rende ~70 caracteres por linha, a faixa que o olho percorre sem se
+ *     perder ao voltar para a linha seguinte;
+ *   - cada pergunta é um cartão separado, com espaço entre eles — uma lista
+ *     colada vira "parede de texto" e cansa a varredura;
+ *   - o alvo de clique tem no mínimo 44px de altura em qualquer tela, medida
+ *     recomendada para toque;
+ *   - as cores de texto ficam acima de 6:1 de contraste (a WCAG AA pede 4,5:1),
+ *     com folga para telas ruins e ambientes claros;
+ *   - o item aberto se destaca por fundo E barra lateral, não só pela cor da
+ *     fonte: quem não distingue bem cores continua enxergando o estado.
+ *
+ * A altura do painel aberto é definida em pixels pelo JavaScript (a partir do
+ * `scrollHeight` real, já com o padding de `.open`), então respostas longas não
+ * ficam cortadas. O CSS cuida do estado fechado e da animação.
+ */
+
+.faqs-section {
+    padding: 3.5rem 0 4rem;
+    background-color: #f4f6f7;
+}
+
+.faqs-section .container {
+    /*
+     * 700px, e não 760: com o cartão largo demais no monitor, a pergunta termina
+     * na esquerda e o "+" fica a quase meia tela de distância — o olho tem de
+     * atravessar um vazio para achar o controle. Estreitar aproxima os dois e
+     * ainda acomoda com folga a coluna de texto da resposta (60ch ≈ 567px).
+     */
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+/* --- cabeçalho ----------------------------------------------------------- */
+
+.faqs-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.faqs-header h1 {
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: #22303c;
+    margin: 0 0 0.65rem;
+    /* Evita que a última palavra do título caia sozinha na linha */
+    text-wrap: balance;
+}
+
+.faqs-header mark {
+    background: transparent;
+    color: #8c6a4f;
+}
+
+.faqs-header p {
+    font-size: 1.0625rem;
+    color: #4d5b67;
+    margin: 0 auto;
+    max-width: 52ch;
+    line-height: 1.65;
+    /* `balance` e não `pretty`: em texto de 2 linhas ele reparte as palavras
+       igualmente entre elas, em vez de deixar a segunda linha com duas palavras */
+    text-wrap: balance;
+}
+
+/* --- sanfona ------------------------------------------------------------- */
+
+.accordion {
+    /* Cartões separados: `display: grid` + `gap` dá o respiro entre perguntas
+       sem depender de margens que colapsam. */
+    display: grid;
+    gap: 12px;
+    margin: 0;
+}
+
+faq-item {
+    display: block;
+    background-color: #ffffff;
+    border: 1px solid #e6ebee;
+    border-radius: 12px;
+    /* A barra lateral do item aberto cresce a partir daqui */
+    border-left: 4px solid transparent;
+    box-shadow: 0 2px 6px rgba(20, 40, 55, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    overflow: hidden;
+    /* Ao navegar por teclado ou por link com âncora, o cartão não encosta na
+       barra fixa do topo */
+    scroll-margin-top: 110px;
+}
+
+/*
+ * Efeitos de mouse só onde existe mouse.
+ *
+ * `@media (hover: hover) and (pointer: fine)` exclui telas de toque: nelas o
+ * hover "gruda" depois do toque e o cartão fica destacado sem motivo. É a
+ * diferença de tratamento entre usar no computador e no celular.
+ */
+@media (hover: hover) and (pointer: fine) {
+    faq-item:hover {
+        border-color: #d6dee4;
+        box-shadow: 0 6px 16px rgba(20, 40, 55, 0.1);
+        /* Deslocamento mínimo: dá a sensação de "levantar" sem mover o texto o
+           suficiente para incomodar quem está lendo */
+        transform: translateY(-1px);
+    }
+
+    faq-item:hover .faq-icon {
+        background-color: #efe6de;
+        color: #7a5a41;
+    }
+
+    .faq-question:hover {
+        color: #7a5a41;
+        background-color: #fbf9f7;
+    }
+}
+
+/* Item aberto: barra lateral + sombra mais presente */
+faq-item:has(.faq-question[aria-expanded="true"]) {
+    border-left-color: #8c6a4f;
+    box-shadow: 0 8px 20px rgba(20, 40, 55, 0.1);
+}
+
+.accordion dt {
+    margin: 0;
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    /* 20px de padding + 1.6 de line-height garante alvo > 44px */
+    padding: 20px 22px;
+    min-height: 44px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.075rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #22303c;
+    text-align: left;
+    /* Sem o realce cinza que o Android pinta ao tocar */
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.faq-question span {
+    /* A pergunta também é texto: limita a linha e quebra sem estourar */
+    max-width: 58ch;
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+}
+
+/* O foco precisa ficar visível: a pergunta é alcançável pelo teclado */
+.faq-question:focus-visible {
+    outline: 3px solid #8c6a4f;
+    outline-offset: -3px;
+    background-color: #fbf9f7;
+}
+
+.faq-question[aria-expanded="true"] {
+    color: #7a5a41;
+}
+
+/* --- ícone --------------------------------------------------------------- */
+
+.faq-question .faq-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    /* O círculo de fundo sinaliza que a linha inteira é clicável */
+    box-sizing: content-box;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: #f2f5f7;
+    color: #5a6b78;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.2s ease, color 0.2s ease;
+}
+
+/* "+" gira 45° e vira "×" */
+.faq-question[aria-expanded="true"] .faq-icon {
+    transform: rotate(45deg);
+    background-color: #8c6a4f;
+    color: #ffffff;
+}
+
+/* --- resposta ------------------------------------------------------------ */
+
+.faq-answer {
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 22px;
+    /*
+     * SÓ `max-height` na transição — `padding` NÃO pode entrar aqui.
+     *
+     * O JavaScript aplica a classe `open` e, na linha seguinte, lê
+     * `panel.scrollHeight` para definir a altura final. Se o padding estivesse
+     * em transição, nesse instante ele ainda valeria 0 e a medida sairia 40px
+     * menor que o conteúdo — a resposta abria cortada. Sem a transição, o
+     * padding já está aplicado quando a medição acontece.
+     */
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-answer.open {
+    padding: 18px 22px 22px;
+    /* A divisória é uma sombra INTERNA, e não `border-top` nem um `::before`
+       com margem: ambos ficariam fora do `scrollHeight` e voltariam a cortar a
+       última linha. Sombra não ocupa espaço no layout. */
+    box-shadow: inset 0 1px 0 #edf1f3;
+}
+
+.faq-answer p {
+    margin: 0;
+    /* ~70 caracteres por linha na prática: `ch` mede a largura do "0", que é mais
+       largo que a média das letras, então 60ch rende cerca de 70 caracteres */
+    max-width: 60ch;
+    color: #46535e;
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+}
+
+/* --- estados e acessibilidade ------------------------------------------- */
+
+/* Os estados de lista ficam fora do <dl> */
+#faqs-state:not(:empty) {
+    margin-bottom: 1.25rem;
+}
+
+/* Sem animação para quem pediu menos movimento no sistema operacional */
+@media (prefers-reduced-motion: reduce) {
+    .faq-answer,
+    .faq-question,
+    .faq-question .faq-icon,
+    faq-item {
+        transition: none;
+    }
+
+    /* Nem o deslocamento de 1px do hover: quem pediu menos movimento não quer
+       nada se mexendo sob o cursor */
+    faq-item:hover {
+        transform: none;
+    }
+}
+
+/* Contraste reforçado quando o sistema pede mais contraste */
+@media (prefers-contrast: more) {
+    faq-item {
+        border-color: #9aa8b2;
+    }
+
+    .faq-question,
+    .faq-answer p {
+        color: #14202a;
+    }
+}
+
+/* --- telas pequenas ----------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .faqs-section {
+        padding: 2.25rem 0 3.5rem;
+    }
+
+    .faqs-header {
+        margin-bottom: 1.75rem;
+    }
+
+    .accordion {
+        gap: 10px;
+    }
+
+    .faq-question {
+        /* Mantém o alvo confortável mesmo com a fonte um pouco menor */
+        padding: 18px 16px;
+        font-size: 1.03rem;
+        gap: 12px;
+    }
+
+    /* O padding lateral do estado fechado acompanha, senão a resposta "salta"
+       para dentro ao abrir */
+    .faq-answer {
+        padding: 0 16px;
+    }
+
+    .faq-answer.open {
+        padding: 16px 16px 18px;
+    }
+
+    .faq-answer p {
+        font-size: 1.0125rem;
+        line-height: 1.75;
+    }
+}
+
+/* Telas muito estreitas: o ícone perde o círculo para sobrar largura ao texto */
+@media (max-width: 400px) {
+    .faq-question .faq-icon {
+        padding: 2px;
+        background-color: transparent;
+    }
+
+    .faq-question[aria-expanded="true"] .faq-icon {
+        background-color: transparent;
+        color: #7a5a41;
+    }
+}

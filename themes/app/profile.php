@@ -1,23 +1,19 @@
 <?php
-    echo $this->layout("_theme");
-?>
-<?php
-$this->start("specific-script");
-?>
-<script type="module" src="<?= url("assets/js/app/profile.js"); ?>"></script>
-<?php
-$this->end();
+$this->layout("_theme");
 ?>
 
-<!-- Formulário para alteração do Perfil do Usuário
-  Nome, E-mail, Senha e Foto.
--->
+<?php $this->start("specific-script"); ?>
+<script type="module" src="<?= url("views/assets/app/scripts/profile.js"); ?>"></script>
+<?php $this->end(); ?>
+
+<!-- Formulário para alteração do Perfil do Usuário: Nome, E-mail e Foto -->
 
 <div class="private-area">
     <h1>Perfil do Usuário</h1>
-    <form id="profile" class="private-area">
+
+    <form id="profile">
         <div class="form-group">
-            <label for="nome">Nome:</label>
+            <label for="name">Nome:</label>
             <input type="text" id="name" name="name" required>
         </div>
         <div class="form-group">
@@ -26,12 +22,16 @@ $this->end();
         </div>
         <button type="submit">Atualizar Perfil</button>
     </form>
-    <div class="toast-container"></div>
+
     <form id="form-photo">
         <div class="form-group">
-            <label for="foto">Foto:</label>
-            <input type="file" id="photo" name="photo">
+            <label for="photo">Foto:</label>
+            <input type="file" id="photo" name="photo" accept="image/jpeg,image/png" aria-describedby="photo-help">
+            <small id="photo-help">JPG ou PNG, até 4 MB.</small>
             <button type="submit">Atualizar Foto</button>
         </div>
     </form>
+
+    <!-- Contêiner para as mensagens toast -->
+    <div class="toast-container"></div>
 </div>
