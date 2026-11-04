@@ -3,7 +3,7 @@
 namespace Source\Support;
 
 use CoffeeCode\Uploader\Image;
-use Exception;
+
 
 /**
  * Upload e manipulação de imagens sobre CoffeeCode\Uploader\Image.
@@ -49,37 +49,46 @@ class ImageUploader
      */
     public function upload(array $file, int $width = self::MAX_WIDTH): ?string
     {
-        $mime = $this->validate($file);
-
-        if ($mime === null) {
+        // Upload da API de referência valida MIME real, tamanho e origem multipart.
+        $receiver = new Upload(sys_get_temp_dir());
+        $receiver->maxImageSize = self::MAX_SIZE;
+        $receiver->allowedImageTypes = self::ALLOWED_TYPES;
+        try {
+            $name = $receiver->image($file);
+        } catch (\RuntimeException $error) {
+            $this->errorMessage = $error->getMessage();
             return null;
         }
 
-        // O Uploader decide a extensão a partir de $file["type"]; usar o mime real
-        // evita que um tipo declarado errado gere um arquivo com extensão inválida.
-        $file["type"] = $mime;
-
-        // O CoffeeCode\Uploader resolve os caminhos a partir do diretório de trabalho atual,
-        // que é o do index.php da API; por isso a raiz do projeto é fixada aqui.
+        $temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $name;
         $previousDir = getcwd();
-        chdir($this->projectRoot());
-
         try {
+            $info = getimagesize($temp);
+            if (!$info || $info[0] * $info[1] > 12000000) {
+                $this->errorMessage = "A imagem deve ter no máximo 12 megapixels.";
+                return null;
+            }
+            chdir($this->projectRoot());
             $image = new Image($this->uploadDir, $this->imageDir);
-            return $image->upload($file, uniqid(md5((string)time())), $width);
-        } catch (Exception $exception) {
-            $this->errorMessage = "Erro ao enviar a imagem: " . $exception->getMessage();
+            $path = $image->upload(["tmp_name" => $temp, "type" => $info["mime"]], pathinfo($name, PATHINFO_FILENAME), $width);
+            if (!is_file($path) || !filesize($path)) {
+                if (is_file($path)) unlink($path);
+                throw new \RuntimeException("Falha de gravação.");
+            }
+            return $path;
+        } catch (\Throwable $error) {
+            $this->errorMessage = "Não foi possível processar a imagem.";
             return null;
         } finally {
             chdir($previousDir);
+            unlink($temp);
         }
     }
 
     /**
      * Envia várias imagens de um input `multiple` e devolve os caminhos gravados.
      *
-     * Um arquivo inválido não interrompe os demais: ele é apenas ignorado e o
-     * motivo fica em getErrorMessage(), para o controlador reportar ao usuário.
+     * Um arquivo inválido desfaz o lote, inclusive os arquivos já gravados.
      *
      * @param string $inputName nome do campo em $_FILES
      * @return string[]
@@ -94,21 +103,20 @@ class ImageUploader
         $normalized = $this->normalizeMultiple($files[$inputName]);
 
         $paths = [];
-        $errors = [];
+
 
         foreach ($normalized as $file) {
             $path = $this->upload($file, $width);
 
             if ($path === null) {
-                $name = $file["name"] ?? "arquivo";
-                $errors[] = "{$name}: {$this->errorMessage}";
-                continue;
+                foreach ($paths as $saved) $this->remove($saved);
+                return [];
             }
 
             $paths[] = $path;
         }
 
-        $this->errorMessage = empty($errors) ? null : implode(" | ", $errors);
+        $this->errorMessage = null;
 
         return $paths;
     }
@@ -127,20 +135,20 @@ class ImageUploader
         }
 
         $root = $this->projectRoot();
-        $base = realpath($root . DIRECTORY_SEPARATOR . $this->uploadDir);
+        $base = realpath($root . DIRECTORY_SEPARATOR . $this->uploadDir . DIRECTORY_SEPARATOR . $this->imageDir);
         $target = realpath($root . DIRECTORY_SEPARATOR . ltrim($relativePath, "/\\"));
 
-        if ($base === false || $target === false || !str_starts_with($target, $base)) {
+        if ($base === false || $target === false || !str_starts_with($target, $base . DIRECTORY_SEPARATOR)) {
             $this->errorMessage = "Arquivo fora do diretório de uploads.";
             return false;
         }
 
-        if (!is_file($target)) {
+        if (!is_file($target) || !in_array(strtolower(pathinfo($target, PATHINFO_EXTENSION)), ["jpg", "jpeg", "png"], true)) {
             $this->errorMessage = "Arquivo não encontrado.";
             return false;
         }
 
-        return unlink($target);
+        return @unlink($target);
     }
 
     /**
@@ -165,43 +173,6 @@ class ImageUploader
         }
 
         return array_values($files);
-    }
-
-    /**
-     * Valida presença, tipo real e tamanho do arquivo.
-     * @return string|null o mime válido, ou null quando o arquivo é recusado
-     */
-    private function validate(array $file): ?string
-    {
-        if (empty($file["name"]) || empty($file["tmp_name"])) {
-            $this->errorMessage = "Nenhum arquivo enviado.";
-            return null;
-        }
-
-        if (!empty($file["error"])) {
-            $this->errorMessage = "Falha no envio do arquivo (código {$file["error"]}).";
-            return null;
-        }
-
-        if (($file["size"] ?? 0) > self::MAX_SIZE) {
-            $limit = (int)(self::MAX_SIZE / 1024 / 1024);
-            $this->errorMessage = "A imagem deve ter no máximo {$limit} MB.";
-            return null;
-        }
-
-        // O tipo declarado pelo navegador é escolhido pelo cliente; o real vem do arquivo.
-        $mime = @mime_content_type($file["tmp_name"]) ?: (string)($file["type"] ?? "");
-
-        if ($mime === "image/jpg") {
-            $mime = "image/jpeg";
-        }
-
-        if (!in_array($mime, self::ALLOWED_TYPES, true)) {
-            $this->errorMessage = "Por favor, envie uma imagem do tipo JPG, JPEG ou PNG.";
-            return null;
-        }
-
-        return $mime;
     }
 
     private function projectRoot(): string

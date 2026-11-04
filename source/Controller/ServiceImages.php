@@ -2,6 +2,7 @@
 
 namespace Source\Controller;
 
+use Source\Core\Connect;
 use Source\Models\Service;
 use Source\Models\ServiceImage;
 use Source\Support\ImageUploader;
@@ -26,8 +27,17 @@ class ServiceImages extends Api
         }
 
         $images = new ServiceImage();
+        if (!(new Service())->selectById($serviceId)) {
+            $this->call(404, "not_found", "Serviço não encontrado.", "error")->back();
+            return;
+        }
+        $rows = $images->selectByService($serviceId);
+        if ($images->getErrorMessage()) {
+            $this->call(500, "internal_server_error", "Não foi possível carregar a galeria.", "error")->back();
+            return;
+        }
         $this->call(200, "success", "Imagens do serviço", "success")
-            ->back(array_map(fn($row) => $this->present($row), $images->selectByService($serviceId)));
+            ->back(array_map(fn($row) => $this->present($row), $rows));
     }
 
     public function insert(array $data): void
@@ -57,62 +67,44 @@ class ServiceImages extends Api
         }
 
         $model = new ServiceImage();
-        $already = $model->countByService($serviceId);
-
-        if ($already >= self::MAX_PER_SERVICE) {
-            $this->call(400, "bad_request",
-                "Este serviço já tem o máximo de " . self::MAX_PER_SERVICE . " imagens.",
-                "error")->back();
-            return;
-        }
-
+        $db = Connect::getInstance();
         $uploader = new ImageUploader();
-        $paths = $uploader->uploadMany("images", $_FILES);
-
-        if (empty($paths)) {
-            $this->call(400, "bad_request",
-                $uploader->getErrorMessage() ?? "Nenhuma imagem válida foi enviada.", "error")->back();
-            return;
-        }
-
-        // Se o envio passar do teto, o excedente é descartado do disco em vez de
-        // ser gravado no banco.
-        $free = self::MAX_PER_SERVICE - $already;
-        foreach (array_slice($paths, $free) as $discarded) {
-            $uploader->remove($discarded);
-        }
-        $paths = array_slice($paths, 0, $free);
-
-        $caption = isset($data["caption"]) && trim((string)$data["caption"]) !== ""
-            ? trim((string)$data["caption"])
-            : null;
-
+        $paths = [];
         $inserted = [];
-
-        foreach ($paths as $index => $path) {
-            // A primeira imagem de um serviço sem fotos entra como capa.
-            $isCover = ($already === 0 && $index === 0) ? 1 : 0;
-
-            $image = new ServiceImage(null, $serviceId, $path, $caption, $isCover);
-
-            if (!$image->insert()) {
-                $uploader->remove($path);
-                continue;
+        try {
+            $db->beginTransaction();
+            if (!$model->lockActiveService($serviceId)) {
+                $db->rollBack();
+                $this->call(404, "not_found", "Serviço inativo ou inexistente.", "error")->back();
+                return;
             }
-
-            $inserted[] = [
-                "id" => $image->getId(),
-                "services_id" => $serviceId,
-                "path" => $path,
-                "caption" => $caption,
-                "cover" => $isCover,
-                "url" => url($path)
-            ];
-        }
-
-        if (empty($inserted)) {
-            $this->call(500, "internal_server_error",
-                "As imagens foram enviadas, mas não foi possível gravá-las no banco.", "error")->back();
+            $already = $model->countByService($serviceId);
+            if ($model->getErrorMessage()) throw new \RuntimeException();
+            $count = count((array)$_FILES["images"]["name"]);
+            $caption = trim((string)($data["caption"] ?? "")) ?: null;
+            if ($count + $already > self::MAX_PER_SERVICE || mb_strlen($caption ?? "") > 255) {
+                $db->rollBack();
+                $this->call(400, "bad_request", "Máximo de 10 imagens por serviço e 255 caracteres na legenda.", "error")->back();
+                return;
+            }
+            $paths = $uploader->uploadMany("images", $_FILES);
+            if (!$paths) {
+                $db->rollBack();
+                $this->call(400, "bad_request", $uploader->getErrorMessage(), "error")->back();
+                return;
+            }
+            foreach ($paths as $index => $path) {
+                $cover = (int)($already === 0 && $index === 0);
+                $image = new ServiceImage(null, $serviceId, $path, $caption, $cover);
+                if (!$image->insert()) throw new \RuntimeException();
+                $inserted[] = ["id" => $image->getId(), "services_id" => $serviceId, "path" => $path,
+                    "caption" => $caption, "cover" => $cover, "url" => url($path)];
+            }
+            $db->commit();
+        } catch (\Throwable $error) {
+            if ($db->inTransaction()) $db->rollBack();
+            foreach ($paths as $path) $uploader->remove($path);
+            $this->call(500, "internal_server_error", "Não foi possível salvar o lote de imagens.", "error")->back();
             return;
         }
 
@@ -179,7 +171,10 @@ class ServiceImages extends Api
 
         // O arquivo só é apagado depois que o registro sai do banco: se a ordem
         // fosse a inversa, uma falha no DELETE deixaria um registro sem imagem.
-        (new ImageUploader())->remove($image->path);
+        if (!(new ImageUploader())->remove($image->path)) {
+            $this->call(500, "internal_server_error", "O registro foi removido, mas o arquivo não pôde ser apagado.", "error")->back();
+            return;
+        }
 
         // Sem capa, a imagem mais antiga que restou assume o posto.
         if ((int)$image->cover === 1) {

@@ -181,13 +181,25 @@ class Services extends Api
             return;
         }
 
-        $service = new Service();
-        // soft delete
-        if (!$service->softDeleteById((int)$data["serviceId"])) {
+        try {
+            $paths = (new \Source\Models\ServiceImage())->deactivateService((int)$data["serviceId"]);
+        } catch (\Throwable $error) {
+            $this->call(500, "internal_server_error", "Não foi possível inativar o serviço.", "error")->back();
+            return;
+        }
+        if ($paths === false) {
             $this->call(404, "not_found", "Serviço não encontrado ou já inativo", "error")->back();
             return;
         }
-
+        $storage = new \Source\Support\ImageUploader();
+        $clean = true;
+        foreach ($paths as $path) {
+            if (!$storage->remove($path)) $clean = false;
+        }
+        if (!$clean) {
+            $this->call(500, "internal_server_error", "Serviço inativado; a limpeza dos arquivos não foi concluída.", "error")->back();
+            return;
+        }
         $this->call(200, "success", "Serviço excluído com sucesso", "success")->back();
     }
 

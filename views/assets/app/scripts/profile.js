@@ -1,3 +1,4 @@
+import { bindImagePreview } from "../../_common/scripts/image-preview.js";
 import UserService from "../../_common/classes/services/UserService.js";
 import User from "../../_common/classes/entities/User.js";
 import { validateImages } from "../../_common/scripts/image-validation.js";
@@ -18,6 +19,8 @@ const handleAuthFailure = createAuthFailureHandler({ session, toast });
 const profileImg = document.querySelector("img[data-profile-photo]");
 const photoInput = document.querySelector("#photo");
 let uploadingPhoto = false;
+const clearPreview = bindImagePreview(photoInput, document.querySelector("#photoPreview"),
+    files => validateImages(files, 1), message => toast.warning(message));
 
 const profileForm = new FormController(document.querySelector("#profile"), {
     rules: {
@@ -131,7 +134,8 @@ photoForm.form.addEventListener("submit", async (event) => {
             profileImg.src = getBackendUrl(photo);
         }
 
-        document.querySelector("#photo").value = "";
+        photoInput.value = "";
+        clearPreview();
     } catch (error) {
         console.error("Erro no upload:", error);
         toast.error(serviceUnavailableMessage());

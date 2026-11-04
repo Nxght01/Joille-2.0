@@ -89,6 +89,36 @@ class ServiceImage extends Model
         $this->cover = $cover;
     }
 
+    /** Serializa uploads e inativação do mesmo serviço até o commit. */
+    public function lockActiveService(int $id): bool
+    {
+        $stmt = Connect::getInstance()->prepare("SELECT id FROM services WHERE id = ? AND active = 1 FOR UPDATE");
+        $stmt->execute([$id]);
+        return (bool)$stmt->fetchColumn();
+    }
+
+    public function deactivateService(int $id): array|false
+    {
+        $db = Connect::getInstance();
+        $db->beginTransaction();
+        try {
+            if (!$this->lockActiveService($id)) {
+                $db->rollBack();
+                return false;
+            }
+            $stmt = $db->prepare("SELECT path FROM service_images WHERE services_id = ? FOR UPDATE");
+            $stmt->execute([$id]);
+            $paths = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            $db->prepare("DELETE FROM service_images WHERE services_id = ?")->execute([$id]);
+            $db->prepare("UPDATE services SET active = 0 WHERE id = ?")->execute([$id]);
+            $db->commit();
+            return $paths;
+        } catch (\Throwable $error) {
+            if ($db->inTransaction()) $db->rollBack();
+            throw $error;
+        }
+    }
+
     /** Imagens de um serviço, capa primeiro. */
     public function selectByService(int $serviceId): array
     {

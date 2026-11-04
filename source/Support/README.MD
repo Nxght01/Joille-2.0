@@ -17,7 +17,7 @@ quebram caminhos relativos.
 
 ## ImageUploader.php
 
-Envolve o `CoffeeCode\Uploader\Image`. Aceita apenas `jpg`, `jpeg` e `png` (validado
+Usa `Source\Support\Upload::image()` para receber e validar o arquivo em uma pasta temporária e `CoffeeCode\Uploader\Image` para redimensionar e gravar somente a imagem processada. A classe `Upload.php` foi integrada a partir da [referência ACME](https://github.com/sorfabiosantos/acme-3am/blob/main/api/source/Support/Upload.php). Aceita apenas `jpg`, `jpeg` e `png` (validado
 pelo **conteúdo** do arquivo, não pelo tipo que o navegador declara), no máximo 4 MB,
 grava em `uploads/images/AAAA/MM/` e devolve o caminho relativo à raiz do projeto —
 o valor guardado em `users.photo` e em `service_images.path`.
@@ -29,7 +29,7 @@ $uploader = new ImageUploader();
 $path = $uploader->upload($_FILES["photo"], ImageUploader::PROFILE_WIDTH);  // null em erro
 
 // Vários arquivos de um input `multiple` (campo `images[]`)
-$paths = $uploader->uploadMany("images", $_FILES);   // [] quando nenhum é válido
+$paths = $uploader->uploadMany("images", $_FILES);   // [] se o lote for inválido
 
 // Remove o arquivo do disco
 $uploader->remove($path);
@@ -37,10 +37,9 @@ $uploader->remove($path);
 $erro = $uploader->getErrorMessage();
 ```
 
-`uploadMany()` não aborta no primeiro arquivo inválido: envia os que dão, e os
-recusados aparecem em `getErrorMessage()`.
+`uploadMany()` desfaz o lote inteiro se um arquivo falha e informa o motivo em `getErrorMessage()`.
 
-`remove()` só apaga caminhos **dentro de `uploads/`** — um valor adulterado no banco
+`remove()` só apaga caminhos **dentro de `uploads/images/`** — um valor adulterado no banco
 não consegue alcançar outros arquivos do projeto.
 
 A raiz do projeto é fixada internamente com `chdir()` e restaurada em seguida, porque

@@ -1,3 +1,4 @@
+import { bindImagePreview } from "../scripts/image-preview.js";
 import { showEmpty, showListError, showLoading, serviceUnavailableMessage } from "../scripts/ui.js";
 import { escapeHtml } from "../scripts/functions.js";
 import { validateImages } from "../scripts/image-validation.js";
@@ -22,6 +23,7 @@ export function ImageGallery({
     container,
     input = null,
     uploadButton = null,
+    preview = null,
     counter = null,
     labels = {},
     onAuthFailure = null,
@@ -59,11 +61,14 @@ export function ImageGallery({
     // Estado próprio de cada galeria
     this.serviceId = null;
     this.images = [];
+    this.clearPreview = preview && input ? bindImagePreview(input, preview,
+        files => validateImages(files, 10 - this.images.length), message => toast.warning(message)) : () => {};
 }
 
 /** Aponta a galeria para outro registro e recarrega (null apenas limpa a tela). */
 ImageGallery.prototype.setServiceId = async function setServiceId(serviceId) {
     this.revision++;
+    this.clearPreview();
     if (this.input) this.input.value = "";
     this.serviceId = serviceId === null || serviceId === undefined || serviceId === ""
         ? null
@@ -195,6 +200,7 @@ ImageGallery.prototype.upload = async function upload() {
     }
     const serviceId = this.serviceId;
     this.busy = true;
+    if (this.uploadButton) this.uploadButton.textContent = "Enviando…";
     this.setEnabled(false);
 
     try {
@@ -210,6 +216,7 @@ ImageGallery.prototype.upload = async function upload() {
         await this.onChange?.();
         if (this.serviceId !== serviceId) return this;
         this.input.value = "";
+        this.clearPreview();
         return await this.load();
     } catch (error) {
         console.error("Erro no upload:", error);
@@ -217,6 +224,7 @@ ImageGallery.prototype.upload = async function upload() {
         return this;
     } finally {
         this.busy = false;
+        if (this.uploadButton) this.uploadButton.textContent = "Enviar imagens";
         this.setEnabled(true);
     }
 };

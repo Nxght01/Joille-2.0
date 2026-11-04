@@ -397,8 +397,19 @@ class Users extends Api
         }
 
         $user = new User();
-        if(!$user->replacePhoto($this->userAuthId, $upload)){
-            $this->call(500, "internal_server_error", $user->getErrorMessage(), "error")->back();
+        try {
+            if (!$user->replacePhoto($this->userAuthId, $upload, $previous)) {
+                $imageUploader->remove($upload);
+                $this->call(404, "not_found", "Perfil não encontrado.", "error")->back();
+                return;
+            }
+        } catch (\PDOException $error) {
+            $imageUploader->remove($upload);
+            $this->call(500, "internal_server_error", "Não foi possível salvar a foto.", "error")->back();
+            return;
+        }
+        if ($previous && !$imageUploader->remove($previous)) {
+            $this->call(500, "internal_server_error", "Nova foto salva, mas a foto anterior não pôde ser removida.", "error")->back();
             return;
         }
 

@@ -36,6 +36,7 @@ const gallery = new ImageGallery({
     container: document.querySelector("#galleryGrid"),
     input: document.querySelector("#galleryInput"),
     uploadButton: document.querySelector("#galleryUpload"),
+    preview: document.querySelector("#galleryPreview"),
     counter: document.querySelector("#galleryCount"),
     onAuthFailure,
     onChange: () => crud.load()

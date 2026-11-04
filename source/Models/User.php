@@ -258,31 +258,29 @@ class User extends Model
         return true;
     }
 
-    // Remove do disco a foto atual antes de gravar a nova
-    public function replacePhoto (int $id, string $photo): bool
+    // A alteração é transacional; o controller só recebe a foto antiga após o commit.
+    public function replacePhoto(int $id, string $photo, ?string &$previous = null): bool
     {
-        $query = "SELECT photo FROM {$this->table} WHERE {$this->primaryKey} = :id";
-        $stmt = Connect::getInstance()->prepare($query);
-        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $current = $stmt->fetch();
-        if($current && !empty($current->photo)){
-            $filePath = __DIR__ . "/../../" . $current->photo;
-            if(file_exists($filePath)){
-                unlink($filePath);
+        $db = Connect::getInstance();
+        try {
+            $db->beginTransaction();
+            $read = $db->prepare("SELECT photo FROM users WHERE id = ? AND active = 1 FOR UPDATE");
+            $read->execute([$id]);
+            $row = $read->fetch();
+            if (!$row) {
+                $db->rollBack();
+                return false;
             }
+            $save = $db->prepare("UPDATE users SET photo = ? WHERE id = ?");
+            $save->execute([$photo, $id]);
+            $db->commit();
+            $this->photo = $photo;
+            $previous = $row->photo;
+            return true;
+        } catch (\PDOException $e) {
+            if ($db->inTransaction()) $db->rollBack();
+            throw $e;
         }
-
-        $this->photo = $photo;
-
-        $query = "UPDATE {$this->table} SET photo = :photo WHERE {$this->primaryKey} = :id";
-        $stmt = Connect::getInstance()->prepare($query);
-        $stmt->bindValue(":photo", $photo);
-        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return true;
     }
 
     /**

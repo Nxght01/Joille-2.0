@@ -81,6 +81,8 @@ $this->layout("_theme");
                 Salve o serviço primeiro para poder enviar imagens.
             </p>
 
+            <p>JPG ou PNG, até 4 MB por imagem e 10 imagens por serviço.</p>
+            <div id="galleryPreview" aria-live="polite"></div>
             <div class="gallery-upload">
                 <input type="file" id="galleryInput" name="images[]"
                        accept="image/jpeg,image/png" multiple disabled>

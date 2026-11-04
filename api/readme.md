@@ -104,6 +104,20 @@ automaticamente; ao excluir a capa, a mais antiga restante assume o posto.
 Validação do upload: JPG/JPEG ou PNG (tipo real do arquivo, não o declarado pelo
 navegador), no máximo 4 MB cada, redimensionadas para 1600px de largura.
 
+A foto do perfil usa `POST /users/photo`, token de **cliente**, multipart `photo`.
+O ID vem exclusivamente do token; o resultado é `data: { id, photo }`, com caminho relativo.
+Foto substituída só sai do disco depois do commit. No erro de persistência (500),
+a foto anterior permanece e o arquivo novo é removido.
+
+Na galeria, a resposta de criação (201) contém a lista com `id`, `services_id`,
+`path`, `caption`, `cover` e `url`; a listagem (200) também traz `created_at`.
+A legenda opcional tem até 255 caracteres. O lote é indivisível: um arquivo inválido
+(400), excesso de imagens (400) ou falha no banco (500) não insere parte do lote.
+As escritas exigem token (401) e perfil administrador (403); imagem de outro serviço
+não pode ser removida (404). A inativação pela rota DELETE do serviço remove os
+metadados da galeria em transação e seus arquivos após o commit.
+Clientes web usam `FormData` e deixam o navegador definir o cabeçalho multipart.
+
 ### Categorias — `/categories` (segunda entidade)
 
 | Método | Rota | Auth |

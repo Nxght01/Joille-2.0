@@ -10,7 +10,6 @@ import { getBackendUrl } from "../../scripts/functions.js";
 export default class ServiceImage extends Entity {
     #servicesId;
     #path;
-    #url;
     #caption;
     #cover;
 
@@ -18,7 +17,6 @@ export default class ServiceImage extends Entity {
         id = null,
         services_id = null,
         path = "",
-        url = null,
         caption = null,
         cover = 0
     } = {}) {
@@ -26,7 +24,6 @@ export default class ServiceImage extends Entity {
 
         this.servicesId = services_id;
         this.path = path;
-        this.url = url;
         this.caption = caption;
         this.cover = cover;
     }
@@ -55,18 +52,16 @@ export default class ServiceImage extends Entity {
     }
 
     set path(value) {
-        this.#path = Entity.requireText(value, "O caminho da imagem");
+        const path = Entity.requireText(value, "O caminho da imagem");
+        if (!/^[\w/-]+\.(?:jpe?g|png)$/i.test(path) || path.startsWith("/")) {
+            throw new TypeError("Caminho de imagem inválido");
+        }
+        this.#path = path;
     }
 
-    /** URL absoluta, pronta para o atributo src. */
+    /** Deriva a URL do caminho; ignora URLs externas recebidas no payload. */
     get url() {
-        return this.#url;
-    }
-
-    set url(value) {
-        this.#url = value === null || value === undefined || value === ""
-            ? getBackendUrl(this.#path)
-            : String(value);
+        return getBackendUrl(this.#path);
     }
 
     get caption() {

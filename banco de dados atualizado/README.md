@@ -109,3 +109,10 @@ As tabelas usam `utf8mb3` (o antigo `utf8`), herdado do modelo original. Ele cob
 todo o português, inclusive acentos, mas não caracteres de 4 bytes como emoji — e
 está marcado como *deprecated* no MySQL 8.4. Migrar para `utf8mb4` é recomendável
 antes de um uso real, e não foi feito aqui para não alterar a estrutura entregue.
+
+Na Etapa 07, a relação é `services.id → service_images.services_id` (1:N).
+Cada linha contém metadados, caminho relativo, legenda, capa e data; os bytes ficam em disco.
+O DELETE de serviço pela API inativa o pai e remove as linhas filhas numa transação,
+depois limpa os arquivos. Não substitua esse fluxo por DELETE manual: a FK sozinha
+não remove arquivos. A estrutura já está no dump e na migration 002; não reaplique a
+migration em um banco que já a recebeu.

@@ -28,6 +28,7 @@ $this->layout("_theme");
             <label for="photo">Foto:</label>
             <input type="file" id="photo" name="photo" accept="image/jpeg,image/png" aria-describedby="photo-help">
             <small id="photo-help">JPG ou PNG, até 4 MB.</small>
+            <div id="photoPreview" aria-live="polite"></div>
             <button type="submit">Atualizar Foto</button>
         </div>
     </form>

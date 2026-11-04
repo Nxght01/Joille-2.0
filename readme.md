@@ -163,16 +163,18 @@ segundo e-mail avisando da alteração.
 
 ## Imagens
 
+[Etapa 07: fluxos, contratos, testes e capturas após recarga](SE2-Etapa07-Imagens.md).
+
 - **Usuário:** uma foto de perfil, redimensionada para 600px de largura.
 - **Serviço (entidade principal):** até 10 imagens, redimensionadas para 1600px,
   com uma marcada como capa — é a que aparece nas listagens.
 
 Validação: JPG/JPEG ou PNG, no máximo 4 MB. O tipo é conferido pelo conteúdo do
-arquivo (`mime_content_type`), não pelo que o navegador declara. Os arquivos vão para
+arquivo (`finfo` e `getimagesize`), não pelo que o navegador declara. Os arquivos vão para
 `uploads/images/AAAA/MM/` e a pasta `uploads/` está no `.gitignore`.
 
 Excluir uma imagem remove o registro **e** o arquivo do disco; `ImageUploader::remove()`
-só apaga caminhos de dentro de `uploads/`, para que um registro adulterado no banco
+só apaga arquivos de imagem dentro de `uploads/images/`, para que um registro adulterado no banco
 não consiga alcançar outros arquivos do projeto.
 
 ## Relatórios e gráficos
