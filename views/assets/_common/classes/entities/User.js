@@ -18,6 +18,8 @@ export default class User extends Entity {
     #active;
     #password = null;
     #token = null;
+    #address = '';
+    #phone = '';
 
     constructor({
         id = null,
@@ -27,7 +29,9 @@ export default class User extends Entity {
         photo = null,
         active = 1,
         password = null,
-        token = null
+        token = null,
+        address = '',
+        phone = ''
     } = {}) {
         super({ id });
 
@@ -36,6 +40,8 @@ export default class User extends Entity {
         this.email = email;
         this.photo = photo;
         this.active = active;
+        this.address = address;
+        this.phone = phone;
 
         if (password) {
             this.password = password;
@@ -48,6 +54,16 @@ export default class User extends Entity {
 
     get typeId() {
         return this.#typeId;
+    }
+    get address() { return this.#address; }
+    set address(value) {
+        if (String(value ?? '').length > 255) throw new RangeError('Endereço muito longo.');
+        this.#address = String(value ?? '').trim();
+    }
+    get phone() { return this.#phone; }
+    set phone(value) {
+        if (String(value ?? '').length > 30) throw new RangeError('Telefone muito longo.');
+        this.#phone = String(value ?? '').trim();
     }
 
     set typeId(value) {
@@ -152,7 +168,9 @@ export default class User extends Entity {
             type_id: this.typeId,
             name: this.name,
             email: this.email,
-            active: this.active
+            active: this.active,
+            address: this.address,
+            phone: this.phone
         };
 
         // A senha só entra no payload quando foi informada nesta operação

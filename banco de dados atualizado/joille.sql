@@ -37,6 +37,7 @@
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `joille` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
 USE `joille`;
+DROP TABLE IF EXISTS `service_requests`;
 DROP TABLE IF EXISTS `categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -274,4 +275,27 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+-- Execute uma vez, depois das migrations 001 a 003. Preserva os dados existentes.
+ALTER TABLE users ADD COLUMN address VARCHAR(255) DEFAULT NULL,
+                  ADD COLUMN phone VARCHAR(30) DEFAULT NULL;
+
+CREATE TABLE service_requests (
+    id INT NOT NULL AUTO_INCREMENT,
+    users_id INT NOT NULL,
+    services_id INT NOT NULL,
+    description TEXT NOT NULL,
+    quantity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+    unit_price DECIMAL(12,2) NOT NULL,
+    status ENUM('pending','in_progress','completed','cancelled') NOT NULL DEFAULT 'pending',
+    admin_notes TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_requests_user (users_id, created_at),
+    CONSTRAINT fk_requests_user FOREIGN KEY (users_id) REFERENCES users(id),
+    CONSTRAINT fk_requests_service FOREIGN KEY (services_id) REFERENCES services(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+COMMENT='Solicitacoes dos clientes; preco capturado do catalogo no momento da criacao';
 

@@ -84,7 +84,7 @@ class Users extends Api
 
         // O admin pode cadastrar tanto outro administrador quanto um cliente
         $typeId = 1;
-        if(isset($data["type_id"]) && filter_var($data["type_id"], FILTER_VALIDATE_INT)){
+        if(isset($data["type_id"])){
             $typeId = (int)$data["type_id"];
             if(!in_array($typeId, [1, 2], true)){
                 $this->call(400, "bad_request", "O campo type_id deve ser 1 (admin) ou 2 (cliente)", "error")->back();
@@ -195,7 +195,7 @@ class Users extends Api
 
     public function tokenValidate (array $data): void
     {
-        if(!$this->authToken (2)){
+        if(!$this->authToken ([1, 2])){
             $this->authFail();
             return;
         }
@@ -205,7 +205,7 @@ class Users extends Api
 
     public function me (array $data): void
     {
-        if(!$this->authToken (2)){
+        if(!$this->authToken ([1, 2])){
             $this->authFail();
             return;
         }
@@ -222,7 +222,8 @@ class Users extends Api
             "email" => $user->getEmail(),
             "photo" => $user->getPhoto(),
             "type_id" => $user->getTypeId(),
-            "active" => $user->getActive()
+            "active" => $user->getActive(),
+            "address" => $user->getAddress(), "phone" => $user->getPhone()
         ];
 
         $this->call(200,"success","Usuário autenticado","success")->back($response);
@@ -230,7 +231,7 @@ class Users extends Api
 
     public function update (array $data): void
     {
-        if(!$this->authToken (2)){
+        if(!$this->authToken ([1, 2])){
             $this->authFail();
             return;
         }
@@ -251,6 +252,15 @@ class Users extends Api
 
         $user->setName($data["name"]);
         $user->setEmail($data["email"]);
+        foreach (['address' => 255, 'phone' => 30] as $field => $limit) {
+            if (isset($data[$field])) {
+                if (!is_string($data[$field]) || mb_strlen($data[$field]) > $limit) {
+                    $this->call(400, 'bad_request', 'Endereço ou telefone inválido.', 'error')->back();
+                    return;
+                }
+                $user->{'set' . ucfirst($field)}(trim($data[$field]));
+            }
+        }
 
         if(!$user->updateById($this->userAuthId)){
             $this->call(500, "internal_server_error", $user->getErrorMessage(), "error")->back();
@@ -260,7 +270,9 @@ class Users extends Api
         $response = [
             "id" => $this->userAuthId,
             "name" => $user->getName(),
-            "email" => $user->getEmail()
+            "email" => $user->getEmail(),
+            "type_id" => $this->userAuthType,
+            "address" => $user->getAddress(), "phone" => $user->getPhone()
         ];
 
         $this->call(200,"success","Usuário atualizado com sucesso","success")->back($response);
@@ -312,8 +324,13 @@ class Users extends Api
             $user->setPassword(password_hash($data["password"], PASSWORD_DEFAULT));
         }
 
-        if(isset($data["type_id"]) && filter_var($data["type_id"], FILTER_VALIDATE_INT)){
-            $user->setTypeId((int)$data["type_id"]);
+        if(isset($data["type_id"])){
+            $typeId = filter_var($data['type_id'], FILTER_VALIDATE_INT);
+            if (!in_array($typeId, [1, 2], true)) {
+                $this->call(400, 'bad_request', 'O perfil deve ser 1 ou 2.', 'error')->back();
+                return;
+            }
+            $user->setTypeId($typeId);
         }
 
         if(array_key_exists("active", $data)){
@@ -325,6 +342,10 @@ class Users extends Api
             $user->setActive($active);
         }
 
+        if ($userId === $this->userAuthId && ($user->getTypeId() !== 1 || !$user->getActive())) {
+            $this->call(400, 'bad_request', 'Você não pode remover seu próprio acesso administrativo.', 'error')->back();
+            return;
+        }
         if(!$user->updateById($userId)){
             $this->call(500, "internal_server_error", $user->getErrorMessage(), "error")->back();
             return;
@@ -343,7 +364,7 @@ class Users extends Api
 
     public function updatePassword (array $data): void
     {
-        if(!$this->authToken (2)){
+        if(!$this->authToken ([1, 2])){
             $this->authFail();
             return;
         }
@@ -375,7 +396,7 @@ class Users extends Api
 
     public function updatePhoto (array $data): void
     {
-        if(!$this->authToken (2)){
+        if(!$this->authToken ([1, 2])){
             $this->authFail();
             return;
         }
@@ -483,6 +504,10 @@ class Users extends Api
 
         $user = new User();
         // soft delete
+        if ((int)$data['userId'] === $this->userAuthId) {
+            $this->call(400, 'bad_request', 'Você não pode inativar seu próprio acesso.', 'error')->back();
+            return;
+        }
         if(!$user->softDeleteById((int)$data["userId"])){
             $this->call(404, "not_found", "Usuário não encontrado ou já inativo", "error")->back();
             return;
@@ -513,7 +538,8 @@ class Users extends Api
     private function validateNameEmail(array $data): bool
     {
         if(!isset($data["name"],$data["email"]) ||
-            empty($data["name"]) || empty($data["email"]) ||
+            !is_string($data['name']) || trim($data['name']) === '' || mb_strlen($data['name']) > 255 ||
+            !is_string($data['email']) || mb_strlen($data['email']) > 255 ||
             !filter_var($data["email"], FILTER_VALIDATE_EMAIL)) {
             return false;
         }

@@ -1,4 +1,5 @@
 <?php
+if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 /**
  * Teste de fumaça da API — executa via CLI: php api-test.php
  * Percorre todas as rotas e confere código HTTP e envelope de resposta.
@@ -13,7 +14,7 @@ require __DIR__ . "/vendor/autoload.php";
 
 use Source\Core\Connect;
 
-const BASE = "http://localhost/projeto/joille2/api";
+define('BASE', rtrim(getenv('JOILLE_BASE_URL') ?: CONF_URL_BASE, '/') . '/api');
 
 $pass = 0;
 $fail = 0;
@@ -146,7 +147,7 @@ $adminToken = $login["data"]["token"] ?? null;
 echo "  token admin: " . ($adminToken ? "recebido (" . strlen($adminToken) . " chars), type_id=" . $login["data"]["type_id"] : "AUSENTE") . "\n";
 
 echo "\n=== 4. Perfil errado (401 sem sessão x 403 sem permissão) ===\n";
-check("GET /users/me com token ADMIN -> 403", "GET", "/users/me", 403, "forbidden", [], $adminToken);
+check("GET /users/me perfil ADMIN -> 200", "GET", "/users/me", 200, "success", [], $adminToken);
 check("POST /categories com token ADMIN -> 201 (perfil certo)", "POST", "/categories", 201, "created",
     ["name" => "ZZ Perfil OK"], $adminToken);
 

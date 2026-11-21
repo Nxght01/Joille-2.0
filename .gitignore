@@ -19,3 +19,4 @@
 /source/Config/Config.php
 /banco de dados atualizado/backup-*.sql
 /banco de dados atualizado/*.local.sql
+/.runtime/

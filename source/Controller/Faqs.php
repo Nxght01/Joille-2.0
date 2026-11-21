@@ -34,7 +34,7 @@ class Faqs extends Api
         }
 
         $question = new Question();
-        if (!$question->selectById((int)$data["faqId"])) {
+        if (!$question->selectById((int)$data["faqId"]) || (!$question->getActive() && !$this->authToken(1))) {
             $this->call(404, "not_found", "FAQ não encontrada", "error")->back();
             return;
         }

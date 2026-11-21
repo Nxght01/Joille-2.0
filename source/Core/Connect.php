@@ -8,7 +8,8 @@ use PDOException;
 abstract class Connect
 {
     private const OPTIONS = [
-        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
+        PDO::MYSQL_ATTR_FOUND_ROWS => true,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
         PDO::ATTR_CASE => PDO::CASE_NATURAL
@@ -21,20 +22,13 @@ abstract class Connect
         if (empty(self::$instance)) {
             try {
                 self::$instance = new PDO(
-                    "mysql:host=" . CONF_DB_HOST . ";port=". CONF_DB_PORT .";dbname=" . CONF_DB_NAME,
+                    "mysql:host=" . CONF_DB_HOST . ";port=". CONF_DB_PORT .";dbname=" . CONF_DB_NAME . ";charset=utf8mb4",
                     CONF_DB_USER,
                     CONF_DB_PASS,
                     self::OPTIONS
                 );
             } catch (PDOException $exception) {
-                $response = [
-                    "code" => 500,
-                    "type" => "error",
-                    "status" => "internal_server_error",
-                    "message" => "Problemas ao conectar com o banco de dados! " . $exception->getMessage() . " - " . $exception->getCode()
-                ];
-                echo json_encode($response);
-                exit();
+                throw new \RuntimeException('Não foi possível conectar ao banco de dados.', 0, $exception);
             }
         }
 

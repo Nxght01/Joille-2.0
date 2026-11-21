@@ -18,6 +18,8 @@ class User extends Model
     private ?string $password;
     private ?string $photo;
     private ?int $active;
+    private ?string $address = null;
+    private ?string $phone = null;
 
     private ?string $token = null;
 
@@ -47,8 +49,13 @@ class User extends Model
 
         $this->table = 'users'; // nome da tabela do banco
         $this->primaryKey = 'id'; // nome da chave primária da tabela
-        $this->fillable = ['typeId', 'statusId', 'servicesId', 'name', 'email', 'password', 'photo', 'active']; // camelCase
+        $this->fillable = ['typeId', 'statusId', 'servicesId', 'name', 'email', 'password', 'photo', 'active', 'address', 'phone'];
     }
+
+    public function getAddress(): ?string { return $this->address; }
+    public function setAddress(?string $address): void { $this->address = $address; }
+    public function getPhone(): ?string { return $this->phone; }
+    public function setPhone(?string $phone): void { $this->phone = $phone; }
 
     public function getId(): ?int
     {

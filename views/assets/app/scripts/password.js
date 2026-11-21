@@ -2,15 +2,17 @@ import UserService from "../../_common/classes/services/UserService.js";
 import FormController from "../../_common/prototypes/FormController.js";
 import { createToast } from "../../_common/prototypes/Toast.js";
 import SessionStorage from "../../_common/scripts/storage.js";
+import {getBackendUrl} from '../../_common/scripts/functions.js';
 import { createAuthFailureHandler, serviceUnavailableMessage } from "../../_common/scripts/ui.js";
 
-const session = new SessionStorage("user");
+const scope = document.querySelector('[data-profile-scope]')?.dataset.profileScope ?? 'user';
+const session = new SessionStorage(scope);
 
 const users = new UserService();
 users.setAuthToken(session.getToken());
 
 const toast = createToast();
-const handleAuthFailure = createAuthFailureHandler({ session, toast });
+const handleAuthFailure = createAuthFailureHandler({ session, toast, loginUrl: getBackendUrl(scope === 'admin' ? 'admin/login' : 'login') });
 
 const form = new FormController(document.querySelector("#form-password"), {
     rules: {

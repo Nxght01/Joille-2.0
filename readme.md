@@ -1,5 +1,34 @@
 # JOILLE
 
+Integrantes: **Elias Lindner Lanzarin e Gustavo Neumann**. Turma a confirmar.
+
+## Revisão integral do trabalho em novembro de 2026
+
+A revisão inclui solicitações de serviço do cliente, gestão do atendimento,
+perfil administrativo, endereço/telefone, suporte a JSON, correções de sessão,
+validação e erros. Consulte a [auditoria de cada requisito](docs/auditoria-requisitos.md),
+a [definição do trabalho](docs/definicao-do-trabalho.md), o [diagrama ER atual](docs/diagrama-er.svg)
+e a [apresentação local](docs/apresentacao.html).
+
+**Quem já tem banco deve aplicar a migration 004 sem reimportar o dump:**
+
+```bash
+php scripts/migrate.php --apply
+```
+
+O script cria backup integral em arquivo ignorado pelo Git antes de adicionar os
+campos e a tabela. É seguro executá-lo novamente: alterações existentes são
+detectadas. Para instalação nova, `joille.sql` já inclui a migration 004.
+
+Novas telas: `/app/solicitacoes`, `/admin/solicitacoes`, `/admin/perfil` e
+`/admin/redefinir-senha`. A documentação complementar dos
+[contratos da API](api/contratos-atualizados.md) inclui a integração mobile.
+
+Testes: 159 verificações de POO, 9 testes de contrato HTTP, testes do componente de
+imagens, 140 verificações da API e 91 de aceite. `tests/start-env.ps1` e
+`tests/run-tests.ps1` usam PHP/MySQL reais e um banco descartável, separado dos dados
+da instalação. Encerrar com `tests/stop-env.ps1`.
+
 Sistema de gerenciamento para empresas de pequeno porte dos ramos de joalheria e
 bijuteria. Aplicação MVC em PHP com uma API REST separada.
 
@@ -82,7 +111,7 @@ composer install
    Detalhes, diagrama ER e uso do Workbench em
    [`banco de dados atualizado/README.md`](banco%20de%20dados%20atualizado/README.md).
 2. Ajuste `CONF_URL_BASE` e `CONF_URL_TEST` em `source/Config/Config.php`.
-3. Replique a mesma URL em `views/assets/_common/scripts/config.js`.
+3. O JavaScript deriva automaticamente a URL base a partir da pasta do site.
 4. Gere uma nova `JWT_SECRET_KEY` para qualquer ambiente que não seja local.
 5. Configure o SMTP (veja abaixo) para habilitar recuperação de senha e contato.
 
@@ -91,7 +120,6 @@ Usuários já cadastrados para teste:
 | Perfil | E-mail | Senha | Onde entra |
 |--------|--------|-------|-----------|
 | Administrador | `admin@joille.com` | `admin@123` | `/admin/login` |
-| Administrador | `eliasTest@joille.com` | `12345678` | `/admin/login` |
 
 **Troque essas senhas antes de qualquer uso real.**
 
@@ -140,8 +168,8 @@ recebeu.
 | Área | Rota | Acesso | Conteúdo |
 |------|------|--------|----------|
 | Pública | `/` | livre | Home, Sobre, Serviços (com galeria de fotos), FAQs, Contato, Localização, Login, Cadastro, Esqueci a senha |
-| Aplicação | `/app/` | cliente logado | Perfil (nome, e-mail, senha, foto), catálogo de serviços |
-| Administrativa | `/admin/` | administrador | Dashboard com indicadores, gráficos e relatórios em PDF; CRUD de usuários, serviços (com N imagens), categorias e FAQs; mensagens de contato |
+| Aplicação | `/app/` | cliente logado | Perfil (nome, e-mail, endereço, telefone, senha, foto), catálogo e solicitações de serviços |
+| Administrativa | `/admin/` | administrador | Perfil próprio; dashboard com indicadores, gráficos e relatórios em PDF; CRUD de usuários, serviços (com N imagens), categorias e FAQs; solicitações e mensagens de contato |
 
 ## Autenticação
 
@@ -150,7 +178,7 @@ Login (`/api/users/login` ou `/api/users/login-admin`) devolve um JWT válido po
 `SessionStorage`, em escopos separados para cliente e administrador, e envia o token
 no header `Authorization: Bearer <token>`.
 
-No servidor, `Source\Controller\Api::authToken(int $typeId)` decodifica o token e
+No servidor, `Source\Controller\Api::authToken(int|array $typeId)` decodifica o token e
 confere no banco se o usuário tem aquele perfil e está ativo. Tipos: `1` = ADMIN,
 `2` = CLIENT.
 
@@ -233,7 +261,7 @@ Nenhum script de tela chama `fetch`; nenhum serviço ou entidade toca no DOM.
 node poo-test.mjs      # 159 verificações — POO: encapsulamento, herança, protótipos, composição
 node --test http-contract-test.mjs # 9 testes de contratos HTTP, sem gravar no banco
 node image-test.mjs    # validação e comportamento da galeria
-php  api-test.php      # 133 verificações — API: CRUD, autenticação, upload, e-mail, PDF e HTTP
+php  api-test.php      # 140 verificações — API: CRUD, autenticação, upload, e-mail, PDF e HTTP
 ```
 
 No modo `"capture"`, `api-test.php` percorre o **fluxo completo** de recuperação de

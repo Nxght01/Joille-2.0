@@ -10,7 +10,8 @@ function renderState(container, message, variant) {
         return;
     }
 
-    container.innerHTML = `<p class="list-state list-state-${variant}">${message}</p>`;
+    const safe = String(message).replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
+    container.innerHTML = `<p class="list-state list-state-${variant}">${safe}</p>`;
 }
 
 export function showLoading(container, message = "Carregando...") {

@@ -90,7 +90,7 @@ class ComposerStaticInit033ce934a534ea60e40c5deba27a5652
         '0174385c3be07e86008907d06ee66531' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Rule/Rule.php',
         '98aea6e41b9cb79b379b10f37ba1f0b7' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/RuleSet/RuleContainer.php',
         '561e2e34a8baacdf6e454d37ad463811' => __DIR__ . '/../..' . '/source/Support/Helpers.php',
-        '6faa98d696a98300f1432095b04f2ed7' => __DIR__ . '/../..' . '/source/Config/Config.php',
+        'fe986feef25020db0798ac0ef9e71069' => __DIR__ . '/../..' . '/source/Config/Bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (

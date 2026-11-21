@@ -1,0 +1,15 @@
+.request-page { max-width: 1050px; margin: 2rem auto; padding: 0 1rem; color: #302922; }
+.request-page h1 { font-size: 2rem; margin-bottom: .5rem; }
+.request-page p { line-height: 1.6; }
+.request-form, .request-card { padding: 1.5rem; margin: 1.25rem 0; border: 1px solid #d8cec5; border-radius: 12px; background: #fff; }
+.request-form { display: grid; gap: .6rem; }
+.request-page input, .request-page select, .request-page textarea { box-sizing: border-box; width: 100%; max-width: 100%; padding: .7rem; border: 1px solid #a99b8d; border-radius: 6px; font: inherit; background: #fff; color: #302922; }
+.request-page button { padding: .65rem 1rem; background: #544236; border: 0; border-radius: 6px; color: #fff; font: inherit; cursor: pointer; }
+.request-page button:disabled { opacity: .55; cursor: wait; }
+.request-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.request-actions h2 { flex: 1; }
+.request-card h3 { margin-top: 0; }
+.request-card p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.request-card .request-status { font-weight: 700; color: #58422b; }
+.request-admin-form { display: grid; gap: .65rem; }
+@media(max-width: 600px) { .request-page { margin: 1rem auto; } .request-form, .request-card { padding: 1rem; } }

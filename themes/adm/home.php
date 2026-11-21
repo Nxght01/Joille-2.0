@@ -53,7 +53,7 @@ $this->layout("_theme");
     <section class="card card-wide">
         <h3>Relatórios em PDF</h3>
         <p class="card-hint">
-            Os relatórios são gerados no servidor com Dompdf e abrem em uma nova aba.
+            Consulte o catálogo, os usuários e as perguntas frequentes em PDF.
         </p>
         <div class="report-actions">
             <button type="button" class="btn btn-report" data-report="services">Catálogo de serviços</button>

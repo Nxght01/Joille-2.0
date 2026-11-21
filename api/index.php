@@ -7,19 +7,19 @@ date_default_timezone_set('America/Sao_Paulo');
 ob_start();
 
 require  __DIR__ . "/../vendor/autoload.php";
+\Source\Support\ApiErrors::register();
 
 // os headers abaixo são necessários para permitir o acesso à API por clientes externos ao domínio
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Headers: Authorization, Content-Type, token");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header('Access-Control-Allow-Credentials: true'); // Permitir credenciais
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-use CoffeeCode\Router\Router;
+use Source\Core\Router;
 
 $route = new Router(url("api"),":");
 
@@ -123,6 +123,14 @@ $route->put("/{contactId}","Contacts:update"); // marca como respondida (admin)
 $route->delete("/{contactId}","Contacts:delete"); // exclui (admin)
 $route->group(null);
 
+$route->group('/requests');
+$route->get('/', 'Requests:listAll');
+$route->get('/{requestId}', 'Requests:listById');
+$route->post('/', 'Requests:insert');
+$route->put('/{requestId}', 'Requests:update');
+$route->delete('/{requestId}', 'Requests:delete');
+$route->group(null);
+
 // Indicadores e relatórios (admin)
 $route->group("/reports");
 $route->get("/dashboard","Reports:dashboard"); // JSON com os números e séries dos gráficos
@@ -142,7 +150,8 @@ if ($route->error()) {
         "code" => 404,
         "type" => "error",
         "status" => "not_found",
-        "message" => "O recurso solicitado não existe."
+        "message" => "O recurso solicitado não existe.",
+        "data" => null
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 

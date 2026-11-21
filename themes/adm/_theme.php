@@ -18,13 +18,15 @@
 <header>
     <h1>Painel de Administração</h1>
     <div class="admin-greeting">
-        <img id="imageAdmin" src="<?= url("views/assets/public/images/avatar-default.svg"); ?>" alt="Foto do administrador" width="50" height="50">
+        <img id="imageAdmin" data-profile-photo src="<?= url("views/assets/public/images/avatar-default.svg"); ?>" alt="Foto do administrador" width="50" height="50">
         <span id="span-admin"></span>
     </div>
 </header>
 
 <nav>
     <a href="<?= url("admin/"); ?>">Dashboard</a>
+    <a href="<?= url('admin/perfil'); ?>">Meu perfil</a>
+    <a href="<?= url('admin/solicitacoes'); ?>">Solicitações</a>
     <a href="<?= url("admin/editar-usuario"); ?>">Gerenciar Usuários</a>
     <a href="<?= url("admin/editar-servicos"); ?>">Gerenciar Serviços</a>
     <a href="<?= url("admin/editar-categoria"); ?>">Gerenciar Categorias</a>

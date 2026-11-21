@@ -1,5 +1,9 @@
 RewriteEngine On
 Options All -Indexes
+RewriteRule ^(?:\.|source/|vendor/|tests/|scripts/|themes/|banco\ de\ dados\ atualizado/) - [F,L,NC]
+<FilesMatch "\.(sql|mwb|log|lock)$">
+    Require all denied
+</FilesMatch>
 
 # ROUTER URL Rewrite
 RewriteCond %{SCRIPT_FILENAME} !-f

@@ -34,7 +34,7 @@ class Categories extends Api
         }
 
         $category = new Category();
-        if (!$category->selectById((int)$data["categoryId"])) {
+        if (!$category->selectById((int)$data["categoryId"]) || (!$category->getActive() && !$this->authToken(1))) {
             $this->call(404, "not_found", "Categoria não encontrada", "error")->back();
             return;
         }
@@ -46,7 +46,8 @@ class Categories extends Api
     {
         if (!isset($data["page"], $data["per_page"]) ||
             !filter_var($data["page"], FILTER_VALIDATE_INT) ||
-            !filter_var($data["per_page"], FILTER_VALIDATE_INT)) {
+            !filter_var($data["per_page"], FILTER_VALIDATE_INT) ||
+            (int)$data['page'] < 1 || (int)$data['per_page'] < 1 || (int)$data['per_page'] > 100) {
             $this->call(400, "bad_request", "Os campos page e per_page são obrigatórios e devem ser números inteiros", "error")->back();
             return;
         }

@@ -104,7 +104,7 @@ class Question extends Model
             $stmt = Connect::getInstance()->query($query);
             return $stmt->fetchAll();
         } catch (PDOException $exception) {
-            $this->errorMessage = $exception->getMessage();
+            throw $exception;
             return [];
         }
     }
@@ -126,7 +126,7 @@ class Question extends Model
             $stmt = Connect::getInstance()->query($query);
             return $stmt->fetchAll();
         } catch (PDOException $exception) {
-            $this->errorMessage = $exception->getMessage();
+            throw $exception;
             return [];
         }
     }

@@ -22,7 +22,16 @@ Toda resposta — de sucesso ou de erro — usa o mesmo formato:
 }
 ```
 
-`data` só aparece quando há conteúdo a devolver.
+`data` está sempre presente: `null` para erros e operações sem conteúdo, `[]` para listas vazias.
+
+Aceita `application/json` (objeto com campos simples), formulário URL-encoded e
+`multipart/form-data` nos uploads. JSON malformado retorna 400. O token Bearer
+vale por 90 minutos. A autorização consulta a conta ativa pelo ID do token, mesmo
+depois de trocar o e-mail. Clientes móveis utilizam os mesmos contratos.
+
+Importe [Joille.postman_collection.json](Joille.postman_collection.json), ajuste
+`base_url`, `email` e `password` e execute o login. O teste da requisição salva o
+token automaticamente na variável `token`; nenhuma credencial real é incluída.
 
 ## Códigos de status
 
@@ -59,11 +68,11 @@ quanto para `update`/`update-admin` — antes o cadastro devolvia 500 e a atuali
 | POST   | `/users/login`           | —      | Login de cliente; devolve o token |
 | POST   | `/users/login-admin`     | —      | Login de administrador |
 | POST   | `/users/register-admin`  | ADMIN  | Cadastra administrador |
-| GET    | `/users/token-validate`  | CLIENT | Confere se o token ainda vale |
-| GET    | `/users/me`              | CLIENT | Dados do usuário autenticado |
-| PUT    | `/users/update`          | CLIENT | Atualiza nome e e-mail |
-| PUT    | `/users/password`        | CLIENT | Troca a senha |
-| POST   | `/users/photo`           | CLIENT | Envia nova foto (multipart) |
+| GET    | `/users/token-validate`  | CLIENT ou ADMIN | Confere se o token ainda vale |
+| GET    | `/users/me`              | CLIENT ou ADMIN | Dados do usuário autenticado |
+| PUT    | `/users/update`          | CLIENT ou ADMIN | Atualiza nome, e-mail, endereço e telefone |
+| PUT    | `/users/password`        | CLIENT ou ADMIN | Troca a senha |
+| POST   | `/users/photo`           | CLIENT ou ADMIN | Envia nova foto (multipart) |
 | GET    | `/users/admin/list`      | ADMIN  | Lista todos os usuários |
 | GET    | `/users/admin/{userId}`  | ADMIN  | Busca por id |
 | PUT    | `/users/admin/{userId}`  | ADMIN  | Atualiza usuário |
@@ -104,7 +113,7 @@ automaticamente; ao excluir a capa, a mais antiga restante assume o posto.
 Validação do upload: JPG/JPEG ou PNG (tipo real do arquivo, não o declarado pelo
 navegador), no máximo 4 MB cada, redimensionadas para 1600px de largura.
 
-A foto do perfil usa `POST /users/photo`, token de **cliente**, multipart `photo`.
+A foto do perfil usa `POST /users/photo`, token de **cliente ou administrador**, multipart `photo`.
 O ID vem exclusivamente do token; o resultado é `data: { id, photo }`, com caminho relativo.
 Foto substituída só sai do disco depois do commit. No erro de persistência (500),
 a foto anterior permanece e o arquivo novo é removido.
@@ -276,3 +285,7 @@ número de segmentos, a **literal precisa ser registrada depois**:
 
 `api-test.php` verifica isso explicitamente: a seção 11 confere que
 `GET /services/list` cai em `listAll`, e não em `listById` com o id `"list"`.
+
+## Contratos detalhados atualizados
+
+Consulte [campos, solicitações e exemplos para mobile](contratos-atualizados.md).

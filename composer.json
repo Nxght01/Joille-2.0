@@ -19,7 +19,7 @@
     },
     "files": [
       "source/Support/Helpers.php",
-      "source/Config/Config.php"
+      "source/Config/Bootstrap.php"
     ]
   },
   "require": {

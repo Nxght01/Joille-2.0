@@ -27,6 +27,9 @@ class Admin
     {
         echo $this->view->render("products",[]);
     }
+    public function profile(): void { echo $this->view->render('profile'); }
+    public function password(): void { echo $this->view->render('password'); }
+    public function requests(): void { echo $this->view->render('requests'); }
 
     public function editUser ()
     {

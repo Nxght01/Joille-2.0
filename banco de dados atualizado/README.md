@@ -1,5 +1,18 @@
 # Banco de dados — Joille
 
+**Atualização 20/11/2026:** o diagrama atual está em
+[SVG](../docs/diagrama-er.svg) e [diagrams.net editável](../docs/diagrama-er.drawio).
+O [universo de discurso](../docs/definicao-do-trabalho.md) acompanha a definição.
+Os `.mwb` antigos são apenas referências históricas.
+
+A migration 004 adiciona `users.address`, `users.phone` e `service_requests`.
+Cada solicitação pertence a um usuário e serviço (duas relações 1:N), guarda
+descrição, quantidade, preço capturado, estado, observação e datas. Não há exclusão
+física de solicitações pela API: o cancelamento preserva o histórico.
+Aplicar em uma instalação existente com `php scripts/migrate.php --apply`, que
+cria backup antes da alteração e detecta colunas/tabela já existentes. O dump
+completo já inclui essa migration.
+
 MySQL / MariaDB, banco `joille`. Todo acesso passa por PDO
 (`Source\Core\Connect`); nenhuma consulta é montada fora dos models.
 

@@ -23,7 +23,7 @@
     <a href="<?= url("/app/"); ?>">Perfil</a>
     <a href="<?= url("/app/servicos"); ?>">Serviços</a>
     <a href="<?= url("/app/redefinir-senha"); ?>">Redefinir Senha</a>
-    <a href="<?= url("/app/carrinho"); ?>">Carrinho</a>
+    <a href="<?= url("/app/solicitacoes"); ?>">Minhas solicitações</a>
     <a id="logout">Sair</a>
 </nav>
 </header>
@@ -35,7 +35,7 @@
     ?>
 </div>
 <footer class="private-footer">
-    © 2023 Nome da Empresa. Todos os direitos reservados.
+    © <?= date('Y'); ?> Joille. Todos os direitos reservados.
 </footer>
 </body>
 </html>

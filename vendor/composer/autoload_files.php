@@ -89,5 +89,5 @@ return array(
     '0174385c3be07e86008907d06ee66531' => $vendorDir . '/sabberworm/php-css-parser/src/Rule/Rule.php',
     '98aea6e41b9cb79b379b10f37ba1f0b7' => $vendorDir . '/sabberworm/php-css-parser/src/RuleSet/RuleContainer.php',
     '561e2e34a8baacdf6e454d37ad463811' => $baseDir . '/source/Support/Helpers.php',
-    '6faa98d696a98300f1432095b04f2ed7' => $baseDir . '/source/Config/Config.php',
+    'fe986feef25020db0798ac0ef9e71069' => $baseDir . '/source/Config/Bootstrap.php',
 );

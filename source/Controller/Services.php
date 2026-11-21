@@ -4,6 +4,7 @@ namespace Source\Controller;
 
 use Source\Controller\Api;
 use Source\Models\Service;
+use Source\Models\Category;
 
 class Services extends Api
 {
@@ -36,7 +37,7 @@ class Services extends Api
         $service = new Service();
         $response = $service->selectByIdWithCategory((int)$data["serviceId"]);
 
-        if (!$response) {
+        if (!$response || (!$response['active'] && !$this->authToken(1))) {
             $this->call(404, "not_found", "Serviço não encontrado", "error")->back();
             return;
         }
@@ -61,13 +62,14 @@ class Services extends Api
     {
         if (!isset($data["page"], $data["per_page"]) ||
             !filter_var($data["page"], FILTER_VALIDATE_INT) ||
-            !filter_var($data["per_page"], FILTER_VALIDATE_INT)) {
+            !filter_var($data["per_page"], FILTER_VALIDATE_INT) ||
+            (int)$data['page'] < 1 || (int)$data['per_page'] < 1 || (int)$data['per_page'] > 100) {
             $this->call(400, "bad_request", "Os campos page e per_page são obrigatórios e devem ser números inteiros", "error")->back();
             return;
         }
 
         $service = new Service();
-        $response = $service->selectPaginator((int)$data["page"], (int)$data["per_page"], [], 'id', 'ASC');
+        $response = $service->selectPaginator((int)$data["page"], (int)$data["per_page"], ['active = 1'], 'id', 'ASC');
         $this->call(200, "success", "Lista de Serviços com Paginação", "success")->back($response);
     }
 
@@ -82,6 +84,7 @@ class Services extends Api
             $this->call(400, "bad_request", "Os campos categories_id, name, description e value são obrigatórios. O campo categories_id deve ser um número inteiro", "error")->back();
             return;
         }
+        if (!$this->validateCatalogData($data)) return;
 
         $service = new Service();
         if ($service->nameInUse($data["name"])) {
@@ -120,6 +123,7 @@ class Services extends Api
         }
 
         $serviceId = (int)$data["serviceId"];
+        if (!$this->validateCatalogData($data)) return;
 
         $service = new Service();
         if (!$service->selectById($serviceId)) {
@@ -222,6 +226,28 @@ class Services extends Api
             empty(trim($data["description"])) || trim((string)$data["value"]) === "" ||
             !filter_var($data["categories_id"], FILTER_VALIDATE_INT)) {
             return false;
+        }
+        return true;
+    }
+
+    private function validateCatalogData(array $data): bool
+    {
+        if (array_key_exists('value', $data) && (!is_numeric($data['value']) || (float)$data['value'] < 0 || (float)$data['value'] > 9999999999.99)) {
+            $this->call(400, 'bad_request', 'O valor deve ser numérico e não negativo.', 'error')->back();
+            return false;
+        }
+        foreach (['name', 'description'] as $field) {
+            if (array_key_exists($field, $data) && (!is_string($data[$field]) || trim($data[$field]) === '' || mb_strlen($data[$field]) > 255)) {
+                $this->call(400, 'bad_request', 'Nome e descrição devem conter de 1 a 255 caracteres.', 'error')->back();
+                return false;
+            }
+        }
+        if (array_key_exists('categories_id', $data)) {
+            $category = new Category();
+            if (!filter_var($data['categories_id'], FILTER_VALIDATE_INT) || !$category->selectById((int)$data['categories_id']) || !$category->getActive()) {
+                $this->call(400, 'bad_request', 'Selecione uma categoria ativa.', 'error')->back();
+                return false;
+            }
         }
         return true;
     }

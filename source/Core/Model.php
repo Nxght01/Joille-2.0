@@ -45,9 +45,10 @@ abstract class Model
     protected function fail(PDOException $exception): bool
     {
         $this->errorState = $exception->getCode() !== null ? (string)$exception->getCode() : null;
-        $this->errorMessage = $exception->getMessage();
-
-        return false;
+        $this->errorMessage = 'Não foi possível salvar os dados.';
+        // Apenas duplicidade é convertida em erro de validação pelo controller.
+        if ($exception->getCode() === '23000' && ($exception->errorInfo[1] ?? null) === 1062) return false;
+        throw $exception;
     }
 
     public function selectById(int $id): bool
@@ -262,7 +263,7 @@ abstract class Model
     public function softDeleteById(int $id): bool
     {
         try {
-            $query = "UPDATE {$this->table} SET active = 0 WHERE {$this->primaryKey} = :id";
+            $query = "UPDATE {$this->table} SET active = 0 WHERE {$this->primaryKey} = :id AND active = 1";
             $stmt = Connect::getInstance()->prepare($query);
             $stmt->bindValue(':id', $id);
             $stmt->execute();

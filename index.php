@@ -2,7 +2,7 @@
 
 require __DIR__ . "/vendor/autoload.php";
 
-use CoffeeCode\Router\Router;
+use Source\Core\Router;
 
 ob_start();
 
@@ -14,7 +14,7 @@ $route->get("/", "Web:home");
 $route->get("/sobre", "Web:about");
 $route->get("/contato", "Web:contact");
 $route->get("/localizacao", "Web:location");
-$route->get("/carrinho-compras","Web:cart");
+$route->get("/carrinho-compras","App:requests");
 $route->get("/services","Web:services");
 $route->get("/faqs","Web:faqs");
 $route->get("/login","Web:login");
@@ -27,6 +27,8 @@ $route->group("/app");
 
 $route->get("/", "App:profile");
 $route->get("/servicos", "App:services");
+$route->get("/solicitacoes", "App:requests");
+$route->get("/carrinho", "App:requests");
 $route->get("/redefinir-senha", "App:password");
 
 //$route->get("/carrinho", "App:cart");
@@ -37,7 +39,10 @@ $route->group("/admin");
 
 $route->get("/", "Admin:home");
 $route->get("/login", "Admin:login");
-$route->get("/cadastro-produtos", "Admin:products");
+$route->get("/cadastro-produtos", "Admin:editServices");
+$route->get("/perfil", "Admin:profile");
+$route->get("/redefinir-senha", "Admin:password");
+$route->get("/solicitacoes", "Admin:requests");
 $route->get("/editar-usuario", "Admin:editUser");
 $route->get("/editar-servicos", "Admin:editServices");
 $route->get("/editar-categoria", "Admin:editCategory");

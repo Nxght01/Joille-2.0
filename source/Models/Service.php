@@ -135,7 +135,7 @@ class Service extends Model
             $stmt->execute();
             return $stmt->fetchAll();
         } catch (PDOException $e) {
-            $this->errorMessage = $e->getMessage();
+            throw $e;
             return [];
         }
     }
@@ -175,7 +175,7 @@ class Service extends Model
 
             return (array)$result;
         } catch (PDOException $e) {
-            $this->errorMessage = $e->getMessage();
+            throw $e;
             return false;
         }
     }
@@ -209,7 +209,7 @@ class Service extends Model
             $stmt = Connect::getInstance()->query($query);
             return $stmt->fetchAll();
         } catch (PDOException $e) {
-            $this->errorMessage = $e->getMessage();
+            throw $e;
             return [];
         }
     }
@@ -240,7 +240,7 @@ class Service extends Model
             $stmt = Connect::getInstance()->query($query);
             return $stmt->fetchAll();
         } catch (PDOException $e) {
-            $this->errorMessage = $e->getMessage();
+            throw $e;
             return [];
         }
     }

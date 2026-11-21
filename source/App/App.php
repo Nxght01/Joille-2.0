@@ -31,4 +31,5 @@ class App
     {
         echo $this->view->render("password",[]);
     }
+    public function requests(): void { echo $this->view->render('requests'); }
 }

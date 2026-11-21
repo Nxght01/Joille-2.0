@@ -8,13 +8,14 @@ import SessionStorage from "../../_common/scripts/storage.js";
 import { getBackendUrl } from "../../_common/scripts/functions.js";
 import { createAuthFailureHandler, serviceUnavailableMessage } from "../../_common/scripts/ui.js";
 
-const session = new SessionStorage("user");
+const scope = document.querySelector('[data-profile-scope]')?.dataset.profileScope ?? 'user';
+const session = new SessionStorage(scope);
 
 const users = new UserService();
 users.setAuthToken(session.getToken());
 
 const toast = createToast();
-const handleAuthFailure = createAuthFailureHandler({ session, toast });
+const handleAuthFailure = createAuthFailureHandler({ session, toast, loginUrl: getBackendUrl(scope === 'admin' ? 'admin/login' : 'login') });
 
 const profileImg = document.querySelector("img[data-profile-photo]");
 const photoInput = document.querySelector("#photo");
@@ -45,7 +46,7 @@ try {
 
     if (result.ok) {
         persist({ photo: result.entity.photo });
-        profileForm.fill({ name: result.entity.name, email: result.entity.email });
+        profileForm.fill({ name: result.entity.name, email: result.entity.email, address: result.entity.address, phone: result.entity.phone });
 
         if (profileImg && result.entity.photo) {
             profileImg.src = getBackendUrl(result.entity.photo);
@@ -74,7 +75,7 @@ profileForm.form.addEventListener("submit", async (event) => {
     let user;
 
     try {
-        user = new User({ ...profileForm.values(), type_id: User.TYPE_CLIENT });
+        user = new User({ ...profileForm.values(), type_id: scope === 'admin' ? User.TYPE_ADMIN : User.TYPE_CLIENT });
     } catch (error) {
         toast.warning(error.message);
         return;

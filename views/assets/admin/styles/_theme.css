@@ -20,8 +20,13 @@ body > header {
 }
 nav {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     background: #35424a;
+}
+@media (max-width: 600px) {
+    body > header h1 { font-size: 1.4rem; text-align: left; }
+    nav a { padding: 12px; }
 }
 nav a {
     color: #ffffff;
