@@ -84,6 +84,8 @@ class Mailer
         string $body,
         ?string $replyTo = null
     ): bool {
+        $this->errorMessage = null;
+        $this->lastCapturePath = null;
         if (!filter_var($toMail, FILTER_VALIDATE_EMAIL)) {
             $this->errorMessage = "Destinatário inválido.";
             return false;
@@ -104,6 +106,7 @@ class Mailer
             $this->mail->isSMTP();
             $this->mail->SMTPAuth = true;
             $this->mail->SMTPDebug = SMTP::DEBUG_OFF;
+            $this->mail->Timeout = 20;
             $this->mail->CharSet = PHPMailer::CHARSET_UTF8;
             $this->mail->Host = CONF_MAIL_HOST;
             $this->mail->Port = CONF_MAIL_PORT;
@@ -116,6 +119,7 @@ class Mailer
             $sender = trim(CONF_MAIL_SENDER_MAIL) !== "" ? CONF_MAIL_SENDER_MAIL : CONF_MAIL_USER;
 
             $this->mail->clearAllRecipients();
+            $this->mail->clearReplyTos();
             $this->mail->setFrom($sender, CONF_MAIL_SENDER_NAME);
             $this->mail->addAddress($toMail, $toName);
 
@@ -231,7 +235,7 @@ class Mailer
                     {$body}
                 </div>
                 <div style="padding:16px 24px;background:#f5f2ee;color:#7a6a60;font-size:12px">
-                    &copy; {$year} {$company} — mensagem automática, não responda este e-mail.
+                    &copy; {$year} {$company} — mensagem enviada pelo site Joille.
                 </div>
             </div>
         </div>

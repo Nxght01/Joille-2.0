@@ -27,9 +27,6 @@ const handleAuthFailure = createAuthFailureHandler({
     loginUrl: getBackendUrl("admin/login")
 });
 
-const money = (value) =>
-    Number(value ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
 function fillCounter(selector, value) {
     const element = document.querySelector(selector);
 
@@ -50,9 +47,9 @@ function renderCharts(data) {
     });
 
     charts.doughnut("chart-catalog", {
-        label: "Valor (R$)",
+        label: "Serviços sob orçamento",
         labels: byCategory.map((row) => row.label),
-        data: byCategory.map((row) => row.total_value)
+        data: byCategory.map((row) => row.quoted)
     });
 
     charts.stackedBar("chart-users", {
@@ -93,7 +90,7 @@ async function loadDashboard() {
         fillCounter("#total-categories", totals.categories ?? 0);
         fillCounter("#total-users", totals.users ?? 0);
         fillCounter("#total-faqs", totals.faqs ?? 0);
-        fillCounter("#catalog-value", money(totals.catalog_value));
+        fillCounter("#catalog-value", totals.quoted_services ?? 0);
         fillCounter("#pending-contacts", totals.pending_contacts ?? 0);
 
         renderCharts(result.data ?? {});

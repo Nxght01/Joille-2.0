@@ -31,13 +31,20 @@ retorna 200. Administradores não podem inativar ou remover seu próprio perfil.
 | GET | `/requests/{id}` | Dono ou ADMIN | Detalhe persistido |
 | POST | `/requests` | CLIENT | Cria pendente com dono e preço definidos no servidor |
 | PUT | `/requests/{id}` | Dono com solicitação pendente | Edita `description` e `quantity` |
-| PUT | `/requests/{id}` | ADMIN | Atualiza `status` e `admin_notes` |
+| PUT | `/requests/{id}` | ADMIN | Atualiza `status`, `admin_notes` e `preliminary_value` |
 | DELETE | `/requests/{id}` | Dono com solicitação pendente ou ADMIN | Cancela e preserva histórico |
 
 Descrição: 10 a 2000 caracteres. Quantidade: inteiro de 1 a 100. `services_id`
 deve apontar para serviço e categoria ativos. Não se pode escolher `users_id`,
 `unit_price` ou o estado inicial no POST. O preço é capturado do catálogo na
 criação e preservado nas edições. O total é `quantity * unit_price`.
+
+`preliminary_value` é uma estimativa **total do projeto**, independente do preço
+histórico e do número de unidades. Somente o administrador pode defini-la no PUT:
+aceita de 0 a 9.999.999.999,99, com até duas casas decimais. Use `null` para remover;
+omitir o campo preserva o valor existente. O cliente pode consultar a estimativa,
+mas campos de preço enviados por ele não são aplicados. Não representa contratação
+ou proposta final. Exemplo: `{"preliminary_value":"2500.75"}`.
 
 Estados: `pending` → `in_progress` → `completed`. Uma solicitação pendente ou em
 atendimento pode passar a `cancelled`. Estados finais não voltam a pendente.

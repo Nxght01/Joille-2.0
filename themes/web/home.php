@@ -1,44 +1,32 @@
-<?php
-$this->layout("_theme");
-?>
-
-<?php $this->start("specific-script"); ?>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sedan:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= url("views/assets/public/styles/home.css"); ?>">
+<?php $this->layout('_theme'); ?>
+<?php $this->start('specific-script'); ?>
+<link rel="stylesheet" href="<?= url('views/assets/public/styles/agency.css'); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/public/styles/agency.css'); ?>">
 <?php $this->end(); ?>
-
-<!-- `.container` é `display: flex`. Título e texto vão juntos em um wrapper,
-     senão viram dois flex items separados e ficam lado a lado, cada um em uma
-     coluna estreita. -->
-<section class="container">
-    <div class="hero-texto">
-        <h1>Bem-vindo à Joille!</h1>
-
-        <p class="texto">
-            Com nossos serviços você coloca sua empresa em um futuro mais conectado!
-        </p>
+<div class="agency-page">
+    <div class="agency-hero">
+        <div>
+            <h1>Conecte os sistemas, as áreas e as máquinas da sua empresa.</h1>
+            <p>A Joille cria soluções de tecnologia para empresas do ramo joalheiro: do projeto da rede física ao desenvolvimento de sistemas que integram sua operação.</p>
+            <div class="agency-actions">
+                <a class="agency-primary" href="<?= url('services'); ?>">Conhecer as soluções</a>
+                <a href="<?= url('contato'); ?>">Conversar sobre meu projeto</a>
+            </div>
+        </div>
+        <img src="<?= url('views/assets/public/images/agency-network.svg'); ?>" alt="Joille conecta produção, estoque, máquinas e gestão por sistemas e redes integrados.">
     </div>
-
-    <img src="<?= url("views/assets/public/images/joiashome.jpg"); ?>" class="image"
-         alt="Peças de joalheria em destaque">
-</section>
-
-<!-- `container-atuacao` é o cartão que o home.css já estilizava; o HTML usava
-     `atuacao`, uma classe que não existia em nenhuma folha -->
-<section class="container-atuacao">
-    <h3>Área de Atuação</h3>
-    <p>
-        Nosso sistema foca em EPPs (empresas de pequeno porte) do ramo de joias e semijoias,
-        oferecendo um serviço que facilita a organização e a administração da grande carga de
-        pedidos feitos por empresas maiores — para que a empresa possa focar em desenvolver
-        seus projetos, com a certeza de ter em mãos um serviço que atende às suas necessidades
-        de gerenciamento interno a qualquer momento e em qualquer lugar.
-    </p>
-
-    <div class="home-cta">
-        <a class="home-cta-primary" href="<?= url("services"); ?>">Ver serviços</a>
-        <a class="home-cta-secondary" href="<?= url("cadastro"); ?>">Criar conta</a>
+    <div class="agency-offers">
+        <article><h2>Redes e infraestrutura</h2><p>Planejamento e implantação da conectividade que liga setores, equipamentos e unidades da sua empresa.</p></article>
+        <article><h2>Sistemas de gestão</h2><p>Aplicações web desenvolvidas conforme seus processos de produção, estoque, comercial e administração.</p></article>
+        <article><h2>Integração e evolução</h2><p>Conexão entre sistemas e máquinas, com análise de compatibilidade e suporte definido para cada projeto.</p></article>
     </div>
-</section>
+    <div class="agency-process">
+        <h2>Do diagnóstico à entrega</h2>
+        <ol>
+            <li><strong>Conte sua necessidade.</strong> Escolha uma solução e envie um briefing sobre sua empresa.</li>
+            <li><strong>Definimos o projeto juntos.</strong> Após a análise técnica, alinhamos escopo, orçamento e prazo.</li>
+            <li><strong>Acompanhe a execução.</strong> Consulte as etapas e os retornos da equipe na sua área do cliente.</li>
+        </ol>
+        <p>Todos os serviços são sob orçamento. Enviar um briefing não confirma a contratação.</p>
+        <div class="agency-actions"><a class="agency-primary" href="<?= url('app/solicitacoes'); ?>">Solicitar projeto</a><a href="<?= url('cadastro'); ?>">Criar conta</a></div>
+    </div>
+</div>

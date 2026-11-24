@@ -31,7 +31,7 @@ const crud = new CrudController({
     itemClass: "category-item",
     template: (category) => `
         <span data-label="ID">${category.id}</span>
-        <span data-label="Nome">${escapeHtml(category.name)}${category.isActive ? "" : " (inativa)"}</span>
+        <span data-label="Nome">${escapeHtml(category.name)}</span>
         <div class="category-actions">
             <button class="btn btn-edit" type="button">Editar</button>
             <button class="btn btn-delete" type="button">Excluir</button>
@@ -42,7 +42,7 @@ const crud = new CrudController({
         empty: "Nenhuma categoria cadastrada.",
         createTitle: "Nova Categoria",
         editTitle: "Edição de Categoria",
-        confirmDelete: "Tem certeza que deseja inativar esta categoria?"
+        confirmDelete: "Tem certeza que deseja excluir esta categoria?"
     },
     loader: () => categories.listAdmin(),
     toEntity: (values) => new Category(values),

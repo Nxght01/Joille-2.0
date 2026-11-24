@@ -1,142 +1,120 @@
-/* styles.css */
-
-/* Estilos para a área privada do site */
-
+/* Área do cliente: a mesma identidade do site, com navegação e ações claras. */
 body.private-area {
-    font-family: Arial, sans-serif;
+    --navy: #2c3e50;
+    --ink: #243746;
+    --muted: #5c6b78;
+    --line: #dce3e8;
+    --surface: #fff;
+    --background: #f4f6f7;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: #f0f0f0; /* Fundo diferente para indicar área privada */
-}
-
-#private-navbar {
-    background-color: #007bff; /* Cor diferente para destacar a área privada */
-    color: #fff;
+    min-height: 100vh;
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 1em;
+    flex-direction: column;
+    background: var(--background);
+    color: var(--ink);
+    font: 16px/1.5 Arial, sans-serif;
 }
-
-#private-navbar a {
-    color: #fff;
-    text-decoration: none;
+.private-area *, .private-area *::before, .private-area *::after { box-sizing: border-box; }
+.private-area [hidden] { display: none !important; }
+.private-area a { color: var(--navy); text-underline-offset: 4px; }
+.private-area :is(a, button, input, select, textarea):focus-visible { outline: 3px solid #377eb2; outline-offset: 3px; }
+.private-area .skip-link { position: absolute; top: -80px; left: 16px; z-index: 20; padding: 12px; background: white; }
+.private-area .skip-link:focus { top: 12px; }
+.app-header { background: var(--navy); color: white; }
+.app-header-inner { max-width: 1184px; padding: 18px 32px; margin: auto; display: flex; align-items: center; gap: 24px; }
+.private-area .app-brand { color: white; font: 40px/1 Georgia, serif; text-decoration: none; letter-spacing: -2px; }
+.app-area-label { color: #dce3e8; font-size: .875rem; border-left: 1px solid #70808e; padding-left: 24px; }
+#user-greeting { margin-left: auto; display: flex; align-items: center; gap: 12px; min-width: 0; }
+#imageUser { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #e7edf1; flex-shrink: 0; }
+#span-user { overflow-wrap: anywhere; font-size: .9rem; }
+.private-area .app-logout { padding: 8px 16px; background: transparent; border: 1px solid #8494a2; color: white; min-height: 44px; }
+.private-area .app-logout:hover { background: #405469; }
+.app-navigation { background: white; border-bottom: 1px solid var(--line); }
+#private-navbar { max-width: 1184px; margin: auto; padding: 0 32px; display: flex; gap: 28px; }
+#private-navbar a { display: flex; align-items: center; min-height: 60px; border-bottom: 3px solid transparent; text-decoration: none; font-size: .925rem; color: var(--muted); }
+#private-navbar a:hover { color: var(--navy); border-bottom-color: #bac7d1; }
+#private-navbar a[aria-current="page"] { color: var(--navy); border-bottom-color: var(--navy); font-weight: bold; }
+.content-private { width: 100%; max-width: 1184px; padding: 40px 32px 64px; margin: 0 auto; flex: 1; }
+.private-footer { padding: 24px max(32px, calc((100% - 1120px) / 2)); border-top: 1px solid var(--line); background: white; display: flex; justify-content: space-between; gap: 16px; font-size: .85rem; color: var(--muted); }
+.private-area h1 { font-size: clamp(1.75rem, 3vw, 2rem); line-height: 1.2; letter-spacing: -.6px; margin: 0 0 12px; }
+.private-area h2 { font-size: 1.125rem; line-height: 1.4; margin: 0 0 8px; }
+.private-area p { margin: 0 0 16px; }
+.app-page-header { margin-bottom: 28px; }
+.app-page-header p, .private-area .request-page > p { color: var(--muted); max-width: 70ch; }
+.private-area .request-page { max-width: none; margin: 0; padding: 0; color: var(--ink); }
+.private-area .request-form, .private-area .request-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 28px; margin: 0; box-shadow: none; min-width: 0; }
+.private-area .request-form { display: grid; gap: 20px; }
+.profile-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); align-items: start; gap: 24px; }
+.profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.field-full { grid-column: 1 / -1; }
+.private-area .form-group { margin: 0; min-width: 0; }
+.private-area label { display: block; margin: 0 0 8px; color: var(--ink); font-size: .875rem; font-weight: 600; }
+.private-area :is(input, select, textarea) { width: 100%; max-width: 100%; min-width: 0; min-height: 44px; padding: 11px 12px; border: 1px solid #bac7d1; border-radius: 6px; color: var(--ink); background: white; font: inherit; }
+.private-area textarea { resize: vertical; min-height: 112px; }
+.private-area input[type="file"] { font-size: .8rem; padding: 8px; }
+.private-area input::file-selector-button { padding: 8px; border: 0; background: #e8eef2; color: var(--navy); border-radius: 4px; margin-right: 8px; cursor: pointer; }
+.private-area small { display: block; color: var(--muted); margin-top: 8px; font-size: .8rem; }
+.private-area button { width: auto; justify-self: start; min-height: 44px; padding: 11px 20px; border: 1px solid var(--navy); border-radius: 6px; font: 600 .9rem/1.4 Arial, sans-serif; color: white; background: var(--navy); cursor: pointer; }
+.private-area button:hover { background: #405469; }
+.private-area button:disabled { opacity: .6; cursor: wait; }
+.form-heading p { color: var(--muted); font-size: .875rem; margin: 0; }
+.form-actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; padding-top: 8px; }
+.form-actions a { font-size: .85rem; }
+.profile-avatar { width: 112px; height: 112px; object-fit: cover; border-radius: 50%; background: #e8eef2; }
+#photoPreview:empty { display: none; }
+#photoPreview img { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; }
+.private-area .form-success { color: #236346; font-size: .875rem; margin: 0; }
+.private-area .password-page .request-form { max-width: 560px; }
+.private-area #request-form { grid-template-columns: minmax(0, 1fr) 200px; margin: 28px 0 36px; }
+#request-form-title, #request-form > .request-actions { grid-column: 1 / -1; }
+.private-area .request-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.private-area .request-actions h2 { margin: 0; }
+.private-area #request-reload, .private-area #request-reset, .private-area .request-card button { color: var(--navy); background: white; border: 1px solid var(--line); }
+.private-area #request-reload:hover, .private-area #request-reset:hover, .private-area .request-card button:hover { background: #e8eef2; }
+#request-list { margin-top: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+#request-list > .list-state { grid-column: 1 / -1; padding: 48px 20px; border: 1px dashed var(--line); border-radius: 8px; }
+.private-area .request-card h3 { font-size: 1rem; margin: 0 0 16px; overflow-wrap: anywhere; }
+.private-area .request-card p { font-size: .9rem; }
+.private-area .request-status { color: var(--navy); border-left: 3px solid #8ba5b8; padding-left: 10px; }
+.services-list { background: white; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.list-header, .service-item { display: grid; grid-template-columns: 1.15fr 1.5fr 1fr .8fr auto; gap: 20px; padding: 22px 24px; align-items: center; }
+.list-header { background: #edf1f4; color: var(--muted); font-size: .8rem; }
+.service-item + .service-item { border-top: 1px solid var(--line); }
+.private-area .service-item h2 { font-size: .975rem; margin: 0; }
+.service-thumbnail { display: block; width: 100%; max-width: 192px; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 6px; margin-bottom: 12px; }
+.service-item > * { min-width: 0; overflow-wrap: anywhere; }
+.service-item span { font-size: .875rem; }
+.service-item [data-label="Descrição"] { color: var(--muted); }
+.service-item [data-label="Valor"] { font-weight: bold; }
+.private-area .service-item a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; text-decoration: none; font-size: .8rem; font-weight: bold; }
+.private-area .service-item a:hover { background: #edf1f4; }
+.private-area .toast-container, .private-area #toast-container { max-width: calc(100vw - 32px); right: 16px; bottom: 16px; }
+.private-area .toast { min-width: 0; }
+@media (max-width: 960px) {
+    .profile-layout { grid-template-columns: minmax(0, 1fr) minmax(260px, .8fr); }
+    .profile-fields { grid-template-columns: 1fr; }
+    .list-header { display: none; }
+    .service-item { grid-template-columns: 1fr 1fr; }
+    .service-item h2, .service-item [data-label="Descrição"] { grid-column: 1 / -1; }
+    .service-item [data-label="Categoria"]::before, .service-item [data-label="Valor"]::before { content: attr(data-label); display: block; font-size: .75rem; font-weight: normal; color: var(--muted); margin-bottom: 4px; }
+    .service-item a { grid-column: 1 / -1; justify-self: start; }
 }
-
-#user-greeting {
-    display: flex;
-    align-items: center;
-    color: #fff;
+@media (max-width: 680px) {
+    .app-header-inner { padding: 18px 20px; gap: 16px; flex-wrap: wrap; }
+    .app-area-label { display: none; }
+    #user-greeting { gap: 8px; max-width: calc(100% - 160px); }
+    #span-user { font-size: .8rem; }
+    #imageUser { width: 36px; height: 36px; }
+    #private-navbar { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+    #private-navbar a { min-height: 48px; font-size: .85rem; }
+    .content-private { padding: 28px 20px 40px; }
+    .profile-layout, .profile-fields, #request-list { grid-template-columns: 1fr; }
+    .private-area .request-form, .private-area .request-card { padding: 22px; }
+    .private-area #request-form { grid-template-columns: 1fr; }
+    .private-footer { padding: 24px 20px; flex-direction: column; gap: 8px; }
+    .form-actions { align-items: stretch; flex-direction: column; }
+    .form-actions button { width: 100%; }
 }
-
-#user-photo {
-    flex: 0 0 50px;
-    overflow: hidden;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 10px;
-    background-color: #ccc; /* Placeholder para a foto do usuário */
-}
-
-#user-photo img {
-    display: block;
-    width: 50px; /* Defina a largura desejada */
-    height: 50px; /* Defina a altura desejada */
-    border-radius: 50%; /* Faz a imagem ficar em formato de círculo */
-    object-fit: cover; /* Garante que a imagem se ajuste ao círculo */
-}
-
-.content-private {
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-footer.private-footer {
-    background-color: #007bff; /* Cor do rodapé para área privada */
-    color: #fff;
-    text-align: center;
-    padding: 1em;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-/* Estilização Geral do Formulário */
-.private-area form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    margin: 20px auto;
-}
-
-/* Estilização dos Campos */
-.private-area .form-group {
-    margin-bottom: 15px;
-}
-
-.private-area .form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.private-area .form-group input[type="text"],
-.private-area .form-group input[type="email"],
-.private-area .form-group input[type="password"],
-.private-area .form-group input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    transition: border-color 0.3s;
-}
-
-.private-area .form-group input[type="text"]:focus,
-.private-area .form-group input[type="email"]:focus,
-.private-area .form-group input[type="password"]:focus,
-.private-area .form-group input[type="file"]:focus {
-    border-color: #007bff;
-}
-
-.private-area button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.private-area button:hover {
-    background-color: #0056b3;
-}
-
-/* Responsividade */
-@media (max-width: 600px) {
-    .private-area form {
-        padding: 10px;
-    }
-}
-
-/* Estilização Específica para o Campo de Foto */
-.private-area .form-group input[type="file"] {
-    background-color: #f8f9fa;
-    border: none;
-}
-/* Formulário de troca da foto exibida no cabeçalho. */
-#form-photo {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 2rem;
+@media (prefers-reduced-motion: reduce) {
+    .private-area *, .private-area *::before { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }

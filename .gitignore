@@ -17,6 +17,7 @@
 
 # Configuração e cópias do banco exclusivas desta instalação.
 /source/Config/Config.php
+/source/Config/Mail.secret.php
 /banco de dados atualizado/backup-*.sql
 /banco de dados atualizado/*.local.sql
 /.runtime/

@@ -78,7 +78,7 @@ export default class HttpClientBase {
             const url = this.#buildUrl(endpoint, params);
 
             const headers = { ...this.#defaultHeaders, ...fetchConfig.headers };
-            if (_isFormData) {
+            if (_isFormData || fetchConfig.body === undefined || fetchConfig.body === null) {
                 delete headers["Content-Type"];
             }
 

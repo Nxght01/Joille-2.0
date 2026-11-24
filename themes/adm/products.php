@@ -8,7 +8,7 @@ $this->layout("_theme");
 
 <div class="container">
     <section class="card">
-        <h2>Cadastro de Produtos</h2>
+        <h2>Catálogo de soluções</h2>
         <p>Módulo ainda não implementado.</p>
     </section>
 </div>

@@ -23,14 +23,25 @@ function renderServices(entities) {
         article.classList.add("service-item");
         article.setAttribute("service-id", service.id);
         for (const [label, value] of [['Nome', service.name], ['Descrição', service.description], ['Categoria', service.categoryName ?? '-'], ['Valor', service.formattedValue]]) {
-            const span = document.createElement('span');
+            const span = document.createElement(label === 'Nome' ? 'h2' : 'span');
             span.dataset.label = label;
             span.textContent = value;
+            if (label === 'Nome' && service.coverImageUrl) {
+                const cover = document.createElement('img');
+                cover.className = 'service-thumbnail';
+                cover.src = service.coverImageUrl;
+                cover.alt = '';
+                cover.loading = 'lazy';
+                cover.width = 192;
+                cover.height = 128;
+                span.prepend(cover);
+            }
             article.append(span);
         }
         const request = document.createElement('a');
         request.href = getBackendUrl(`app/solicitacoes?service=${service.id}`);
-        request.textContent = 'Solicitar serviço';
+        request.textContent = 'Solicitar projeto';
+        request.setAttribute('aria-label', `Solicitar projeto: ${service.name}`);
         article.append(request);
         servicesContainer.appendChild(article);
     });

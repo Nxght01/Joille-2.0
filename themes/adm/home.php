@@ -9,7 +9,7 @@ $this->layout("_theme");
 <?php $this->start("specific-script"); ?>
 <!-- Chart.js: geração dos gráficos do painel -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script type="module" src="<?= url("views/assets/admin/scripts/home.js"); ?>"></script>
+<script type="module" src="<?= url("views/assets/admin/scripts/home.js"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/admin/scripts/home.js'); ?>"></script>
 <?php $this->end(); ?>
 
 <div class="container">
@@ -40,7 +40,7 @@ $this->layout("_theme");
     </section>
 
     <section class="card">
-        <h3>Valor em catálogo</h3>
+        <h3>Serviços sob orçamento</h3>
         <strong id="catalog-value">-</strong>
     </section>
 
@@ -68,7 +68,7 @@ $this->layout("_theme");
     </section>
 
     <section class="card chart-card">
-        <h3>Valor do catálogo por categoria</h3>
+        <h3>Serviços sob orçamento por categoria</h3>
         <div class="chart-holder"><canvas id="chart-catalog"></canvas></div>
     </section>
 

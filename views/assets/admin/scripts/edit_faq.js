@@ -44,7 +44,7 @@ const crud = new CrudController({
     itemClass: "service-item",
     template: (faq) => `
         <span data-label="ID">${faq.id}</span>
-        <span data-label="Pergunta">${escapeHtml(faq.resume())}${faq.isActive ? "" : " (inativa)"}</span>
+        <span data-label="Pergunta">${escapeHtml(faq.resume())}</span>
         <span data-label="Tipo">${escapeHtml(typeLabel(faq.typesId))}</span>
         <div class="service-actions">
             <button class="btn btn-edit" type="button">Editar</button>
@@ -56,7 +56,7 @@ const crud = new CrudController({
         empty: "Nenhuma pergunta cadastrada.",
         createTitle: "Nova Pergunta",
         editTitle: "Edição de Pergunta",
-        confirmDelete: "Tem certeza que deseja inativar esta pergunta?"
+        confirmDelete: "Tem certeza que deseja excluir esta pergunta?"
     },
     loader: () => faqs.listAdmin(),
     toEntity: (values) => new Faq(values),

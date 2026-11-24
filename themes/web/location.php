@@ -10,7 +10,7 @@ $this->layout("_theme");
     <div class="container">
         <header class="location-header">
             <h1 id="location-heading">Onde <mark>nos encontrar</mark></h1>
-            <p>Atendimento presencial com hora marcada, e retirada de peças no balcão.</p>
+            <p>Reuniões de diagnóstico com hora marcada. Visitas técnicas e implantação presencial são combinadas conforme o projeto.</p>
         </header>
 
         <div class="location-grid">

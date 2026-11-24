@@ -8,7 +8,7 @@ $this->layout("_theme");
 <?php $this->end(); ?>
 
 <?php $this->start("specific-script"); ?>
-<script type="module" src="<?= url("views/assets/admin/scripts/edit_services.js"); ?>"></script>
+<script type="module" src="<?= url("views/assets/admin/scripts/edit_services.js"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/admin/scripts/edit_services.js'); ?>"></script>
 <?php $this->end(); ?>
 
 <header>
@@ -54,8 +54,9 @@ $this->layout("_theme");
             </div>
 
             <div class="form-group">
-                <label for="value">Valor</label>
-                <input type="text" id="value" name="value" class="form-control" required>
+                <label for="value">Valor de referência (R$)</label>
+                <input type="text" id="value" name="value" class="form-control" value="0" aria-describedby="value-help" required>
+                <small id="value-help">Use 0 para apresentar a solução como “Sob orçamento”. O preço final é definido após a análise do projeto.</small>
             </div>
 
             <div class="form-group">

@@ -8,6 +8,7 @@ import ServiceService from "./views/assets/_common/classes/services/ServiceServi
 import CategoryService from "./views/assets/_common/classes/services/CategoryService.js";
 import FaqService from "./views/assets/_common/classes/services/FaqService.js";
 import UserService from "./views/assets/_common/classes/services/UserService.js";
+import ContactService from "./views/assets/_common/classes/services/ContactService.js";
 import { createToast } from "./views/assets/_common/prototypes/Toast.js";
 import { API_BASE_URL } from "./views/assets/_common/scripts/config.js";
 
@@ -15,6 +16,18 @@ function respond(t, payload, status = 200) {
     return t.mock.method(globalThis, "fetch", async () => new Response(JSON.stringify(payload), {
         status, headers: { "Content-Type": "application/json" }
     }));
+}
+
+for (const status of ['sent', 'captured', 'failed']) {
+    test(`Contato: confirmação ${status} não exige uma mensagem completa`, async t => {
+        const acknowledgement = {id:9,name:'Teste Joille',email:'teste@example.test',subject:'Teste',mail_status:status,mail_delivered:status==='sent',inbox_url:status==='captured'?'/storage/mail/':null};
+        respond(t, {code:201,type:'success',message:'Contato registrado.',data:acknowledgement}, 201);
+        const result = await new ContactService().create({name:'Teste Joille',email:'teste@example.test',subject:'Teste',message:'Mensagem de teste do formulário.'});
+        assert.equal(result.ok,true);
+        assert.deepEqual(result.data,acknowledgement);
+        assert.equal(result.message,'Contato registrado.');
+        assert.equal(result.entity,undefined);
+    });
 }
 
 for (const [Client, Entity, resource, record] of [
@@ -39,6 +52,8 @@ for (const [Client, Entity, resource, record] of [
         assert.equal(removed.ok, true);
         assert.equal(removed.entity, null);
         const calls = fetchMock.mock.calls.map(({ arguments: args }) => args);
+        assert.equal(calls[4][1].headers['Content-Type'], undefined, 'DELETE sem corpo não anuncia JSON');
+        assert.equal(calls[4][1].body, undefined);
         assert.deepEqual(calls.map(([url, config]) => [url, config.method]), [
             [API_BASE_URL + resource, "GET"], [API_BASE_URL + resource + "/7", "GET"],
             [API_BASE_URL + resource, "POST"], [API_BASE_URL + resource + "/7", "PUT"],

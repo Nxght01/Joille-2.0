@@ -22,7 +22,14 @@ class Router extends \CoffeeCode\Router\Router
             return;
         }
         if ($this->jsonBody === null) {
-            $body = json_decode(file_get_contents('php://input'), false, 32, JSON_THROW_ON_ERROR);
+            $input = file_get_contents('php://input');
+            // DELETE identifica o recurso pela URL e pode não enviar um corpo.
+            if ($this->httpMethod === 'DELETE' && trim($input) === '') {
+                $this->jsonBody = [];
+                $this->data = [];
+                return;
+            }
+            $body = json_decode($input, false, 32, JSON_THROW_ON_ERROR);
             if (!$body instanceof \stdClass) {
                 throw new \InvalidArgumentException('O corpo JSON deve ser um objeto.');
             }

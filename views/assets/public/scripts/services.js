@@ -3,7 +3,7 @@ import CategoryService from "../../_common/classes/services/CategoryService.js";
 import ServiceImageService from "../../_common/classes/services/ServiceImageService.js";
 import ImageGallery from "../../_common/prototypes/ImageGallery.js";
 import { createToast } from "../../_common/prototypes/Toast.js";
-import { escapeHtml, showDataSelect } from "../../_common/scripts/functions.js";
+import { escapeHtml, showDataSelect, getBackendUrl } from "../../_common/scripts/functions.js";
 import { serviceUnavailableMessage, showEmpty, showListError, showLoading } from "../../_common/scripts/ui.js";
 
 const services = new ServiceService();
@@ -52,13 +52,14 @@ function renderServices(entities) {
             <div class="service-cover">
                 ${service.coverImageUrl
                     ? `<img src="${encodeURI(service.coverImageUrl)}" alt="Foto do serviço ${name}" loading="lazy">`
-                    : `<span class="service-cover-empty">sem foto</span>`}
+                    : `<img src="${getBackendUrl('views/assets/public/images/agency-network.svg')}" alt="" loading="lazy">`}
             </div>
             <h2>${name}</h2>
             <p>${escapeHtml(service.description)}</p>
             <span class="service-category">${escapeHtml(service.categoryName ?? "")}</span>
             <strong class="service-value">${service.formattedValue}</strong>
-            <button type="button" class="btn btn-gallery" ${service.hasImages ? "" : "disabled"}>
+            <a class="service-request-link" href="${getBackendUrl('app/solicitacoes')}?service=${service.id}">Solicitar projeto</a>
+            <button type="button" class="btn btn-gallery" ${service.hasImages ? "" : "hidden"}>
                 ${service.hasImages ? `Ver fotos (${service.imagesCount})` : "Sem fotos"}
             </button>
         `;

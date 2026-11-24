@@ -58,7 +58,7 @@ class ServiceRequest
             if (!$current) throw new \DomainException('Solicitação não encontrada.', 404);
             if (!$admin && $current->status !== 'pending') throw new \DomainException('Somente solicitações pendentes podem ser alteradas ou canceladas pelo cliente.', 409);
             if ($admin || $cancel) {
-                $status = $cancel ? 'cancelled' : ($data['status'] ?? '');
+                $status = $cancel ? 'cancelled' : ($data['status'] ?? $current->status);
                 $allowed = [
                     'pending' => ['pending', 'in_progress', 'cancelled'],
                     'in_progress' => ['in_progress', 'completed', 'cancelled'],
@@ -67,8 +67,12 @@ class ServiceRequest
                 if (!in_array($status, $allowed[$current->status], true)) throw new \DomainException('Transição de atendimento inválida.', 409);
                 $notes = $admin ? trim($data['admin_notes'] ?? $current->admin_notes ?? '') : $current->admin_notes;
                 if (mb_strlen($notes ?? '') > 2000) throw new \DomainException('Use até 2000 caracteres na observação.', 400);
-                $stmt = $db->prepare('UPDATE service_requests SET status = ?, admin_notes = ? WHERE id = ?');
-                $stmt->execute([$status, $notes, $id]);
+                $estimate = $current->preliminary_value;
+                if ($admin && array_key_exists('preliminary_value', $data)) {
+                    $estimate = $this->validateEstimate($data['preliminary_value']);
+                }
+                $stmt = $db->prepare('UPDATE service_requests SET status = ?, admin_notes = ?, preliminary_value = ? WHERE id = ?');
+                $stmt->execute([$status, $notes, $estimate, $id]);
             } else {
                 $stmt = $db->prepare('UPDATE service_requests SET description = ?, quantity = ? WHERE id = ?');
                 $stmt->execute([$data['description'], $data['quantity'], $id]);
@@ -79,5 +83,18 @@ class ServiceRequest
             if ($db->inTransaction()) $db->rollBack();
             throw $e;
         }
+    }
+
+    private function validateEstimate(mixed $value): ?string
+    {
+        if ($value === null || $value === '') return null;
+        if (!is_string($value) && !is_int($value) && !is_float($value)) {
+            throw new \DomainException('Informe um valor preliminar válido.', 400);
+        }
+        $value = str_replace(',', '.', trim((string)$value));
+        if (!preg_match('/^\d{1,10}(?:\.\d{1,2})?$/D', $value)) {
+            throw new \DomainException('Use um valor entre 0 e 9.999.999.999,99, com até duas casas decimais.', 400);
+        }
+        return $value;
     }
 }

@@ -58,7 +58,7 @@ class Requests extends Api
     private function validate(array $data): void
     {
         if (!isset($data['description']) || !is_string($data['description']) || mb_strlen(trim($data['description'])) < 10 || mb_strlen($data['description']) > 2000) {
-            throw new \DomainException('Descreva o atendimento em 10 a 2000 caracteres.', 400);
+            throw new \DomainException('Descreva o projeto em 10 a 2000 caracteres.', 400);
         }
         if (!filter_var($data['quantity'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 100]])) {
             throw new \DomainException('A quantidade deve estar entre 1 e 100.', 400);

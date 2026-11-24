@@ -2,6 +2,54 @@
 
 Integrantes: **Elias Lindner Lanzarin e Gustavo Neumann**. Turma a confirmar.
 
+## Agência de tecnologia para o ramo joalheiro
+
+As seis ilustrações dos serviços estão em `views/assets/public/images/services/`,
+com os prompts e a correspondência dos serviços no `catalog.json`. Para instalá-las
+em outro banco já configurado com o catálogo da agência, execute
+`php scripts/install-service-images.php --apply`. O script copia os PNGs para uploads,
+vincula as capas pelo nome do serviço e preserva as imagens já existentes. Executá-lo
+novamente não duplica as imagens. As imagens foram criadas com a ferramenta nativa
+de geração de imagens e são ilustrações dos serviços.
+
+O catálogo oferece infraestrutura de redes, sistemas de gestão, integração de
+máquinas e dados, além de suporte. O cliente envia um briefing em **Meus projetos**;
+o administrador acompanha análise, execução e entrega, com retornos para a empresa.
+Preço, escopo e prazo são combinados após a análise. Enviar um briefing não confirma
+a contratação. O portal recebe e acompanha projetos; as integrações são serviços
+a desenvolver conforme cada proposta.
+
+Na instalação nova, o dump `banco de dados atualizado/joille.sql` já inclui o catálogo.
+Para converter uma instalação existente, após a migration 004, execute **uma vez**:
+
+```bash
+php scripts/migrate-agency.php --apply
+```
+
+O script cria um backup integral local ignorado pelo Git e aplica a migration 005
+em transação. Serviços, categorias e FAQs anteriores são inativados; solicitações,
+valores históricos e imagens são preservados. Não reaplique para atualizar textos:
+a conversão inativa serviços fora do catálogo inicial. Edite-os pelo painel.
+
+Para uma limpeza definitiva solicitada pelo responsável, `php scripts/cleanup-inactive.php`
+mostra os inativos sem alterar dados. A aplicação exige `--apply --database=joille`,
+gera outro backup e recusa a exclusão quando projetos ou mensagens dependem desses
+registros. Também limpa tokens de recuperação já usados ou vencidos. Não exclui outros
+bancos, arquivos de backup ou tabelas da estrutura.
+
+Convenção da API: `services.value = 0` e `service_requests.unit_price = 0` representam
+**sob orçamento**, exibido sem valor monetário no catálogo e nas solicitações.
+`quantity` representa o número de unidades/filiais do projeto; o briefing registra
+empresa, cidade, áreas, equipamentos, sistemas e prazo desejado. Valores positivos
+de solicitações antigas continuam monetários. O retorno do admin não altera o preço
+registrado. O administrador pode definir uma estimativa total em **Valor preliminar**,
+visível ao cliente, sem multiplicar pelas unidades. Campo vazio remove a estimativa.
+Esta versão não inclui emissão ou aceite eletrônico de propostas.
+
+Para habilitar essa opção em bancos existentes: `php scripts/migrate-estimate.php --apply`.
+A migration 006 cria `service_requests.preliminary_value` após salvar backup da tabela;
+é seguro executar o script novamente. Instalações novas já recebem a coluna no dump.
+
 ## Revisão integral do trabalho em novembro de 2026
 
 A revisão inclui solicitações de serviço do cliente, gestão do atendimento,
@@ -25,7 +73,7 @@ Novas telas: `/app/solicitacoes`, `/admin/solicitacoes`, `/admin/perfil` e
 [contratos da API](api/contratos-atualizados.md) inclui a integração mobile.
 
 Testes: 159 verificações de POO, 9 testes de contrato HTTP, testes do componente de
-imagens, 140 verificações da API e 91 de aceite. `tests/start-env.ps1` e
+imagens, 140 verificações da API e 117 de aceite. `tests/start-env.ps1` e
 `tests/run-tests.ps1` usam PHP/MySQL reais e um banco descartável, separado dos dados
 da instalação. Encerrar com `tests/stop-env.ps1`.
 
@@ -33,6 +81,27 @@ Sistema de gerenciamento para empresas de pequeno porte dos ramos de joalheria e
 bijuteria. Aplicação MVC em PHP com uma API REST separada.
 
 ## Tecnologias
+
+### Envio real de e-mails pelo Gmail
+
+Os contatos são encaminhados para **joilleifsul@gmail.com**, usando essa mesma
+conta como remetente, SMTP `smtp.gmail.com:587` e STARTTLS. O endereço do visitante
+fica no Reply-To. A confirmação do contato e a recuperação de senha continuam
+sendo enviadas ao endereço do próprio usuário.
+
+Na conta Google, ative a verificação em duas etapas e gere uma
+[senha de app](https://support.google.com/accounts/answer/185833?hl=pt-BR).
+No PowerShell, execute `scripts/configure-gmail.ps1` e cole a senha na entrada
+oculta. O script salva `source/Config/Mail.secret.php` (ignorado pelo Git e bloqueado
+para acesso web) e envia um teste à conta da Joille. Não use a senha normal da conta.
+Como alternativa, configure `JOILLE_MAIL_PASSWORD` no ambiente do processo PHP.
+
+`php scripts/test-mail.php` confere a configuração sem imprimir a senha;
+`php scripts/test-mail.php --send` envia um teste real. Aceitação SMTP não garante
+que a mensagem vá para a caixa principal: confira também spam. Enquanto faltar
+a credencial ou houver falha no SMTP, o contato fica salvo no painel e o formulário
+informa que o encaminhamento por e-mail falhou. Os testes automatizados usam
+configuração isolada em modo `capture` e não enviam mensagens externas.
 
 | Camada | Tecnologia |
 |--------|-----------|

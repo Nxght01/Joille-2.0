@@ -2,6 +2,7 @@
 <html lang="pt-br">
 
 <head>
+    <?php require __DIR__ . '/../shared/module-versions.php'; ?>
     <meta charset="UTF-8">
     <!--
         Sem esta linha o celular renderiza a página com largura de desktop
@@ -57,7 +58,7 @@
     <div class="toast-container"></div>
 
     <footer>
-        <p>&copy; 2024 — Joille • Fornecedor de Serviços. Todos os direitos reservados.</p>
+        <p>&copy; <?= date('Y'); ?> — Joille • Sistemas, redes e integração para o ramo joalheiro.</p>
     </footer>
 
 </body>

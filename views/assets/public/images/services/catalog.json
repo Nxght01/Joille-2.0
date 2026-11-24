@@ -1,0 +1,47 @@
+{
+  "generator": "Built-in image_gen",
+  "images": [
+    {
+      "slug": "diagnostico-infraestrutura",
+      "name": "Diagnóstico e projeto de infraestrutura",
+      "prompt": "Use case: stylized-concept. Create ONE premium 3D editorial illustration for a service catalog of Joille, a technology agency serving jewelry manufacturers. Landscape 3:2 composition, cohesive architectural miniature aesthetic, matte navy blue #2c3e50, porcelain white, brushed silver, restrained warm brass jewelry accents. Soft daylight studio lighting, pale blue-gray seamless backdrop, physically convincing objects and fine materials, clean professional composition, clear silhouettes readable as a small catalog thumbnail, main scene in central 75% safe crop area. No text, no letters, no logos, no watermark, no collage, no people, no excessive neon, no floating abstract cubes. An overhead three-quarter miniature jewelry factory floor plan on a desk, with clearly distinct production benches, inventory shelving and office areas, a rolled technical blueprint, a precision caliper and a small tablet showing only a network topology drawn with clean lines and dots. A few gold ring samples on one production bench establish the jewelry context. Emphasize planning and technical assessment.",
+      "file": "diagnostico-infraestrutura-v1.png",
+      "caption": "Ilustração de diagnóstico e projeto de infraestrutura para empresas joalheiras."
+    },
+    {
+      "slug": "redes-conectividade",
+      "name": "Implantação de redes e conectividade",
+      "prompt": "Use case: stylized-concept. Create ONE premium 3D editorial illustration for a service catalog of Joille, a technology agency serving jewelry manufacturers. Landscape 3:2 composition, cohesive architectural miniature aesthetic, matte navy blue #2c3e50, porcelain white, brushed silver, restrained warm brass jewelry accents. Soft daylight studio lighting, pale blue-gray seamless backdrop, physically convincing objects and fine materials, clean professional composition, clear silhouettes readable as a small catalog thumbnail, main scene in central 75% safe crop area. No text, no letters, no logos, no watermark, no collage, no people, no excessive neon, no floating abstract cubes. A beautifully organized compact navy server rack, silver network switch and patch panel with neatly routed blue Ethernet cables connected to a ceiling Wi-Fi access point and two office workstations in a small cutaway jewelry workshop. Gold ring trays sit discreetly on a distant bench. Emphasize tangible physical networking and structured cabling; not software dashboards.",
+      "file": "redes-conectividade-v1.png",
+      "caption": "Ilustração de implantação de redes e conectividade para empresas joalheiras."
+    },
+    {
+      "slug": "sistemas-gestao",
+      "name": "Desenvolvimento de sistemas de gestão",
+      "prompt": "Use case: stylized-concept. Create ONE premium 3D editorial illustration for a service catalog of Joille, a technology agency serving jewelry manufacturers. Landscape 3:2 composition, cohesive architectural miniature aesthetic, matte navy blue #2c3e50, porcelain white, brushed silver, restrained warm brass jewelry accents. Soft daylight studio lighting, pale blue-gray seamless backdrop, physically convincing objects and fine materials, clean professional composition, clear silhouettes readable as a small catalog thumbnail, main scene in central 75% safe crop area. No text, no letters, no logos, no watermark, no collage, no people, no excessive neon, no floating abstract cubes. A desktop monitor and slim tablet on a refined workbench, showing an elegant navy and white management interface made only of clean chart bars, inventory tile thumbnails, workflow columns and progress indicators without any text or numbers. Beside them are organized trays of gold ring blanks and a small inventory shelf with neat boxes. Emphasize custom management software for production and stock.",
+      "file": "sistemas-gestao-v1.png",
+      "caption": "Ilustração de desenvolvimento de sistemas de gestão para empresas joalheiras."
+    },
+    {
+      "slug": "integracao-maquinas",
+      "name": "Integração de máquinas e produção",
+      "prompt": "Use case: stylized-concept. Create ONE premium 3D editorial illustration for a service catalog of Joille, a technology agency serving jewelry manufacturers. Landscape 3:2 composition, cohesive architectural miniature aesthetic, matte navy blue #2c3e50, porcelain white, brushed silver, restrained warm brass jewelry accents. Soft daylight studio lighting, pale blue-gray seamless backdrop, physically convincing objects and fine materials, clean professional composition, clear silhouettes readable as a small catalog thumbnail, main scene in central 75% safe crop area. No text, no letters, no logos, no watermark, no collage, no people, no excessive neon, no floating abstract cubes. A compact enclosed CNC jewelry milling machine with its clear protective door CLOSED, a gold ring blank in its work area, and a small industrial sensor and edge gateway physically connected by a tidy cable to a monitor with simple production telemetry bars and waveforms without text. Precision silver tooling, navy enclosure. Emphasize integration and machine production data, not robotic science fiction.",
+      "file": "integracao-maquinas-v1.png",
+      "caption": "Ilustração de integração de máquinas e produção para empresas joalheiras."
+    },
+    {
+      "slug": "integracao-dados",
+      "name": "Integração de sistemas e dados",
+      "prompt": "Use case: stylized-concept. Create ONE premium 3D editorial illustration for a service catalog of Joille, a technology agency serving jewelry manufacturers. Landscape 3:2 composition, cohesive architectural miniature aesthetic, matte navy blue #2c3e50, porcelain white, brushed silver, restrained warm brass jewelry accents. Soft daylight studio lighting, pale blue-gray seamless backdrop, physically convincing objects and fine materials, clean professional composition, clear silhouettes readable as a small catalog thumbnail, main scene in central 75% safe crop area. No text, no letters, no logos, no watermark, no collage, no people, no excessive neon, no floating abstract cubes. A coherent tabletop arrangement of three slim computer screens on distinct low platforms representing inventory, production and commercial management through small inventory tiles, process flow shapes and chart bars with no text. Elegant thin blue data conduits converge into a central silver server gateway. Include a small tray of brass rings as a jewelry manufacturing cue. Emphasize information flowing between distinct systems.",
+      "file": "integracao-dados-v1.png",
+      "caption": "Ilustração de integração de sistemas e dados para empresas joalheiras."
+    },
+    {
+      "slug": "suporte-evolucao",
+      "name": "Suporte e evolução contínua",
+      "prompt": "Use case: stylized-concept. Create ONE premium 3D editorial illustration for a service catalog of Joille, a technology agency serving jewelry manufacturers. Landscape 3:2 composition, cohesive architectural miniature aesthetic, matte navy blue #2c3e50, porcelain white, brushed silver, restrained warm brass jewelry accents. Soft daylight studio lighting, pale blue-gray seamless backdrop, physically convincing objects and fine materials, clean professional composition, clear silhouettes readable as a small catalog thumbnail, main scene in central 75% safe crop area. No text, no letters, no logos, no watermark, no collage, no people, no excessive neon, no floating abstract cubes. A laptop showing simple system health graphs with green status dots and a maintenance progress ring, beside a professional headset, a compact neatly organized toolkit and a small navy server unit. A small tray of gold ring samples adds jewelry industry context. Restrained composition conveying ongoing technical support, preventive maintenance and software improvement, not a call-center photograph.",
+      "file": "suporte-evolucao-v1.png",
+      "caption": "Ilustração de suporte e evolução contínua para empresas joalheiras."
+    }
+  ]
+}

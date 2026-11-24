@@ -28,8 +28,8 @@ function resetForm() {
     editing = null;
     form.form.reset();
     form.form.elements.services_id.disabled = false;
-    document.querySelector('#request-form-title').textContent = 'Nova solicitação';
-    form.form.querySelector('[type=submit]').textContent = 'Enviar solicitação';
+    document.querySelector('#request-form-title').textContent = 'Solicitar projeto';
+    form.form.querySelector('[type=submit]').textContent = 'Enviar briefing';
     document.querySelector('#request-reset').hidden = true;
 }
 
@@ -55,24 +55,34 @@ function render(request) {
     const card = element('article', undefined, 'request-card');
     card.append(element('h3', `#${request.id} · ${request.serviceName}`));
     card.append(element('p', request.statusLabel, 'request-status'));
-    if (admin) card.append(element('p', `Cliente: ${request.customerName}`));
-    card.append(element('p', `${request.quantity} peça(s) · Estimativa: ${request.formattedTotal}`));
+    if (admin) card.append(element('p', `Responsável: ${request.customerName}`));
+    card.append(element('p', `${request.quantity} unidade(s) da empresa · ${request.formattedTotal}`));
+    card.append(element('p', `Valor preliminar do projeto: ${request.formattedPreliminaryValue}`));
+    if (request.preliminaryValue !== null) card.append(element('p', 'Estimativa total sujeita à definição do escopo e à proposta final.'));
     card.append(element('p', request.description));
-    if (request.notes) card.append(element('p', `Retorno da equipe: ${request.notes}`));
+    if (request.notes) card.append(element('p', `Retorno sobre o projeto: ${request.notes}`));
     if (admin) {
         const controls = element('form', undefined, 'request-admin-form');
-        const label = element('label', 'Situação do atendimento');
+        const label = element('label', 'Etapa do projeto');
         const select = element('select');
         const allowed = {pending: ['pending','in_progress','cancelled'], in_progress: ['in_progress','completed','cancelled'], completed: ['completed'], cancelled: ['cancelled']};
         allowed[request.status].forEach(status => select.add(new Option(ServiceRequest.statuses[status], status)));
         select.value = request.status;
         label.append(select);
-        const noteLabel = element('label', 'Observação para o cliente');
+        const noteLabel = element('label', 'Retorno para a empresa');
         const notes = element('textarea'); notes.value = request.notes; notes.maxLength = 2000;
         noteLabel.append(notes);
-        const save = element('button', 'Salvar atendimento'); save.type = 'submit';
-        controls.append(label, noteLabel, save);
-        controls.addEventListener('submit', event => { event.preventDefault(); act(() => api.updateStatus(request.id, select.value, notes.value), save); });
+        const priceLabel = element('label', 'Valor preliminar total (R$)');
+        const price = element('input');
+        price.type = 'number'; price.min = '0'; price.max = '9999999999.99'; price.step = '0.01';
+        price.name = 'preliminary_value'; price.value = request.preliminaryValue ?? '';
+        price.placeholder = 'Ainda não definido';
+        const priceHelp = element('small', 'Valor total do projeto, sem multiplicar pelas unidades. Deixe vazio para remover a estimativa.');
+        priceHelp.id = `estimate-help-${request.id}`; price.setAttribute('aria-describedby', priceHelp.id);
+        priceLabel.append(price);
+        const save = element('button', 'Atualizar projeto'); save.type = 'submit';
+        controls.append(label, priceLabel, priceHelp, noteLabel, save);
+        controls.addEventListener('submit', event => { event.preventDefault(); act(() => api.updateStatus(request.id, select.value, notes.value, price.value === '' ? null : price.value), save); });
         card.append(controls);
     } else if (request.canEdit) {
         const actions = element('div', undefined, 'request-actions');
@@ -82,14 +92,14 @@ function render(request) {
             editing = request;
             form.fill(request.toJSON());
             form.form.elements.services_id.disabled = true;
-            document.querySelector('#request-form-title').textContent = `Editar solicitação #${request.id}`;
+            document.querySelector('#request-form-title').textContent = `Editar projeto #${request.id}`;
             form.form.querySelector('[type=submit]').textContent = 'Salvar alterações';
             document.querySelector('#request-reset').hidden = false;
             form.form.scrollIntoView({behavior:'smooth'});
         });
-        const cancel = element('button', 'Cancelar solicitação'); cancel.type = 'button';
+        const cancel = element('button', 'Cancelar projeto'); cancel.type = 'button';
         cancel.addEventListener('click', () => {
-            if (confirm(`Cancelar a solicitação #${request.id}?`)) act(() => api.remove(request.id), cancel);
+            if (confirm(`Cancelar o projeto #${request.id}?`)) act(() => api.remove(request.id), cancel);
         });
         actions.append(edit, cancel); card.append(actions);
     }
@@ -97,14 +107,14 @@ function render(request) {
 }
 
 async function load() {
-    showLoading(list, 'Carregando solicitações...');
+    showLoading(list, 'Carregando projetos...');
     try {
         const result = await api.list();
         if (!result.ok) { fail(result); showListError(list, result.message); return; }
         list.replaceChildren();
-        if (!result.entities.length) { showEmpty(list, 'Nenhuma solicitação registrada.'); return; }
+        if (!result.entities.length) { showEmpty(list, admin ? 'Nenhum projeto recebido até o momento.' : 'Você ainda não enviou um projeto. Escolha uma solução para começar.'); return; }
         result.entities.forEach(render);
-    } catch { showListError(list, 'Não foi possível carregar as solicitações. Tente atualizar a lista.'); }
+    } catch { showListError(list, 'Não foi possível carregar os projetos. Tente atualizar a lista.'); }
 }
 document.querySelector('#request-reload').addEventListener('click', load);
 if (form) {

@@ -46,6 +46,7 @@ class Reports extends Api
         $this->call(200, "success", "Indicadores do painel", "success")->back([
             "totals" => [
                 "services" => $totalServices,
+                "quoted_services" => array_sum(array_map(fn($row) => (int)$row->quoted, $byCategory)),
                 "categories" => count($byCategory),
                 "users" => $totalUsers,
                 "faqs" => $totalFaqs,
@@ -56,6 +57,7 @@ class Reports extends Api
             "services_by_category" => array_map(fn($row) => [
                 "label" => $row->category_name,
                 "total" => (int)$row->total,
+                "quoted" => (int)$row->quoted,
                 "total_value" => round((float)$row->total_value, 2)
             ], $byCategory),
             "users_by_type" => array_map(fn($row) => [
@@ -92,7 +94,7 @@ class Reports extends Api
             "serviços" => count($rows),
             "categorias" => count($stats),
             "ativos" => count(array_filter($rows, fn($row) => (int)$row->active === 1)),
-            "em catálogo" => $this->money(array_sum(array_map(fn($row) => (float)$row->value, $rows)))
+            "sob orçamento" => count(array_filter($rows, fn($row) => (float)$row->value === 0))
         ]);
 
         $report->setColumns(["#", "Serviço", "Categoria", "Valor", "Imagens", "Situação"]);
@@ -100,7 +102,7 @@ class Reports extends Api
             $row->id,
             $row->name,
             $row->category_name,
-            $this->money((float)$row->value),
+            (float)$row->value === 0 ? 'Sob orçamento' : $this->money((float)$row->value),
             $row->images,
             (int)$row->active === 1 ? "Ativo" : "Inativo"
         ], $rows));

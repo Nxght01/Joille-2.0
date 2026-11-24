@@ -4,15 +4,17 @@
 
 <?php $this->start("specific-script"); ?>
 <link rel="stylesheet" href="<?= url("views/assets/public/styles/services.css"); ?>">
+<link rel="stylesheet" href="<?= url("views/assets/public/styles/agency.css"); ?>">
 <link rel="stylesheet" href="<?= url("views/assets/_common/styles/gallery.css"); ?>">
 <script src="https://kit.fontawesome.com/10c90aa659.js" crossorigin="anonymous"></script>
-<script type="module" src="<?= url("views/assets/public/scripts/services.js"); ?>"></script>
+<script type="module" src="<?= url("views/assets/public/scripts/services.js"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/public/scripts/services.js'); ?>"></script>
 <?php $this->end(); ?>
 
 <section class="services-section">
     <div class="container">
-        <h1 class="section-title">Nossos Serviços para Joalherias</h1>
+        <h1 class="section-title">Tecnologia para empresas joalheiras</h1>
 
+        <p>Sistemas de gestão, infraestrutura de redes e integração de máquinas. Cada projeto recebe uma análise técnica e um orçamento próprio.</p>
         <div class="services-filter">
             <label for="filterCategories">Filtrar por categoria:</label>
             <select id="filterCategories">

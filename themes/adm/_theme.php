@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <?php require __DIR__ . '/../shared/module-versions.php'; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>..:: Painel de Administração ::..</title>
@@ -26,7 +27,7 @@
 <nav>
     <a href="<?= url("admin/dashboard"); ?>">Dashboard</a>
     <a href="<?= url('admin/perfil'); ?>">Meu perfil</a>
-    <a href="<?= url('admin/solicitacoes'); ?>">Solicitações</a>
+    <a href="<?= url('admin/solicitacoes'); ?>">Projetos</a>
     <a href="<?= url("admin/editar-usuario"); ?>">Gerenciar Usuários</a>
     <a href="<?= url("admin/editar-servicos"); ?>">Gerenciar Serviços</a>
     <a href="<?= url("admin/editar-categoria"); ?>">Gerenciar Categorias</a>

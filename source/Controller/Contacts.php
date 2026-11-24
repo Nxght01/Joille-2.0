@@ -58,7 +58,7 @@ class Contacts extends Api
         } elseif ($delivered) {
             $message = "Mensagem enviada com sucesso! Em breve entraremos em contato.";
         } else {
-            $message = "Mensagem registrada com sucesso! Nossa equipe responderá em breve.";
+            $message = "Sua mensagem foi salva para a equipe, mas não foi possível encaminhar o e-mail agora.";
         }
 
         $this->call(201, "created", $message, "success")->back([
@@ -66,7 +66,8 @@ class Contacts extends Api
             "name" => $name,
             "email" => $email,
             "subject" => $subject,
-            "mail_delivered" => $delivered,
+            "mail_delivered" => $delivered && !Mailer::isCaptureMode(),
+            "mail_status" => Mailer::isCaptureMode() ? 'captured' : ($delivered ? 'sent' : 'failed'),
             "inbox_url" => Mailer::isCaptureMode() ? Mailer::captureInboxUrl() : null
         ]);
     }
@@ -187,6 +188,8 @@ class Contacts extends Api
             HTML,
             $email // Reply-To: responder no cliente de e-mail já vai ao visitante
         );
+
+        if (!$delivered) error_log('Joille: falha ao encaminhar contato por SMTP. ' . $mailer->getErrorMessage());
 
         if ($delivered) {
             (new Mailer())->send(

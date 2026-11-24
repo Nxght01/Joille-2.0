@@ -1,5 +1,5 @@
 <?php
-$this->layout("_theme");
+$this->layout("_theme", ['activePage' => 'password', 'pageTitle' => 'Segurança | Joille']);
 ?>
 
 <?php $this->start("specific-script"); ?>
@@ -7,25 +7,29 @@ $this->layout("_theme");
 <link rel="stylesheet" href="<?= url('views/assets/_common/styles/requests.css'); ?>">
 <?php $this->end(); ?>
 
-<div class="private-area request-page" data-profile-scope="<?= $profileScope ?? 'user'; ?>">
-    <h1>Redefinir Senha</h1>
+<section class="password-page request-page" data-profile-scope="<?= $profileScope ?? 'user'; ?>">
+    <header class="app-page-header">
+        <h1>Segurança</h1>
+        <p>Atualize sua senha para manter o acesso à sua conta protegido.</p>
+    </header>
 
     <form id="form-password" class="request-form">
+        <div class="form-heading"><h2>Alterar senha</h2><p id="password-help">Use uma senha com pelo menos 8 caracteres.</p></div>
         <div class="form-group">
             <label for="password">Senha atual:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
         </div>
         <div class="form-group">
             <label for="newPassword">Nova senha:</label>
-            <input type="password" id="newPassword" name="newPassword" minlength="8" required>
+            <input type="password" id="newPassword" name="newPassword" autocomplete="new-password" aria-describedby="password-help" minlength="8" required>
         </div>
         <div class="form-group">
             <label for="confirmNewPassword">Confirme a nova senha:</label>
-            <input type="password" id="confirmNewPassword" name="confirmNewPassword" minlength="8" required>
+            <input type="password" id="confirmNewPassword" name="confirmNewPassword" autocomplete="new-password" minlength="8" required>
         </div>
-        <button type="submit">Atualizar Senha</button>
+        <button type="submit">Salvar nova senha</button>
     </form>
 
     <!-- Contêiner para as mensagens toast -->
     <div class="toast-container"></div>
-</div>
+</section>

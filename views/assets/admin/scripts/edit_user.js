@@ -35,7 +35,7 @@ const crud = new CrudController({
     // listagem: sem ela não há como saber quem tem acesso ao painel.
     template: (user) => `
         <span data-label="ID">${user.id}</span>
-        <span data-label="Nome">${escapeHtml(user.name)}${user.isActive ? "" : " (inativo)"}</span>
+        <span data-label="Nome">${escapeHtml(user.name)}</span>
         <span data-label="Email">${escapeHtml(user.email)}</span>
         <span data-label="Perfil">
             <span class="badge ${user.isAdmin ? "badge-admin" : "badge-client"}">
@@ -52,7 +52,7 @@ const crud = new CrudController({
         empty: "Nenhum usuário encontrado.",
         createTitle: "Novo Usuário",
         editTitle: "Edição de Usuário",
-        confirmDelete: "Tem certeza que deseja inativar este usuário?"
+        confirmDelete: "Tem certeza que deseja excluir este usuário?"
     },
     toEntity: (values) => {
         // A senha só é obrigatória no cadastro; na edição, em branco = manter

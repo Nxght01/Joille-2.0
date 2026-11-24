@@ -66,7 +66,7 @@ const crud = new CrudController({
                         alt="Capa de ${escapeHtml(service.name)}" loading="lazy">`
                 : `<span class="list-thumb list-thumb-empty">sem foto</span>`
         }</span>
-        <span data-label="Nome">${escapeHtml(service.name)}${service.isActive ? "" : " (inativo)"}</span>
+        <span data-label="Nome">${escapeHtml(service.name)}</span>
         <span data-label="Categoria">${escapeHtml(service.categoryName ?? "-")}</span>
         <span data-label="Imagens">${service.imagesCount}</span>
         <div class="service-actions">
@@ -79,9 +79,9 @@ const crud = new CrudController({
         empty: "Nenhum serviço cadastrado.",
         createTitle: "Novo Serviço",
         editTitle: "Edição de Serviço",
-        confirmDelete: "Tem certeza que deseja inativar este serviço?"
+        confirmDelete: "Tem certeza que deseja excluir este serviço?"
     },
-    // Listagem administrativa: mostra também os inativos
+    // O controller omite registros excluídos da listagem administrativa.
     loader: () => services.listAdmin(),
     // Converte os valores do formulário na entidade (validação nos setters)
     toEntity: (values) => new Service(values),
@@ -101,7 +101,7 @@ crud.bind({
 
 // Preenche os selects de categoria
 try {
-    const result = await categories.listAdmin();
+    const result = await categories.list();
 
     if (result.ok) {
         showDataSelect(result.entities, document.querySelector("#categories_id"));

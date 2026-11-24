@@ -4,6 +4,7 @@ import {readFileSync, readdirSync, existsSync, unlinkSync, writeFileSync, mkdirS
 import {resolve, join} from 'node:path';
 import {randomBytes} from 'node:crypto';
 import RequestService from '../views/assets/_common/classes/services/RequestService.js';
+import Service from '../views/assets/_common/classes/entities/Service.js';
 import ServiceRequest from '../views/assets/_common/classes/entities/ServiceRequest.js';
 
 const base = process.env.JOILLE_BASE_URL;
@@ -95,6 +96,36 @@ try {
     await request('DELETE','/requests/'+cancel.id,undefined,userA.token);
     check('Cancelamento preserva o histórico', (await request('GET','/requests/'+cancel.id,undefined,userA.token)).status === 'cancelled');
     await request('POST','/requests',entity.toJSON(),admin.token,403);
+    const quoteService = record('services', await request('POST','/services', {...payload,name:'Integração '+run,value:0},admin.token,201));
+    check('Catálogo apresenta preço zero como sob orçamento', new Service(quoteService).formattedValue === 'Sob orçamento');
+    const briefing = 'Empresa de joias em Pelotas; integrar produção, estoque e três máquinas em duas unidades.';
+    const quoted = record('service_requests', await request('POST','/requests',{services_id:quoteService.id,description:briefing,quantity:2},userA.token,201));
+    const quoteView = (await client.find(quoted.id)).entity;
+    check('Briefing preserva unidades e orçamento sem apresentar serviço gratuito', quoteView.description === briefing && quoteView.quantity === 2 && quoteView.formattedTotal === 'Sob orçamento' && quoteView.statusLabel === 'Em análise');
+    check('Projeto novo inicia sem estimativa preliminar', quoteView.preliminaryValue === null);
+    const adminProjects = new RequestService(); adminProjects.setAuthToken(admin.token);
+    assert.equal((await adminProjects.updateStatus(quoted.id,'pending','Análise inicial','1250.50')).ok,true);
+    const estimated = (await client.find(quoted.id)).entity;
+    check('Cliente vê a estimativa total sem multiplicar pelas unidades', estimated.preliminaryValue === 1250.50 && estimated.formattedPreliminaryValue.includes('1.250,50'));
+    await request('PUT','/requests/'+quoted.id,{description:briefing,quantity:3,preliminary_value:1},userA.token);
+    check('Cliente não consegue alterar a estimativa do administrador', (await client.find(quoted.id)).entity.preliminaryValue === 1250.50);
+    await request('PUT','/requests/'+quoted.id,{description:briefing,quantity:1,preliminary_value:1},userB.token,404);
+    for (const invalid of [-1, '1.234', '10000000000', true, [], 'abc']) {
+        await request('PUT','/requests/'+quoted.id,{status:'in_progress',preliminary_value:invalid},admin.token,400);
+    }
+    const unchangedEstimate = (await client.find(quoted.id)).entity;
+    check('Valor inválido não altera preço nem etapa', unchangedEstimate.preliminaryValue === 1250.50 && unchangedEstimate.status === 'pending');
+    await request('PUT','/requests/'+quoted.id,{preliminary_value:'0.00'},admin.token);
+    check('Zero é estimativa definida, diferente de orçamento vazio', (await client.find(quoted.id)).entity.preliminaryValue === 0);
+    assert.equal((await adminProjects.updateStatus(quoted.id,'pending','Aguardando definição',null)).ok,true);
+    check('Admin pode remover a estimativa sem afetar o briefing', (await client.find(quoted.id)).entity.preliminaryValue === null);
+    await request('PUT','/requests/'+quoted.id,{preliminary_value:'2500,75'},admin.token);
+    await request('PUT','/requests/'+quoted.id,{status:'in_progress',admin_notes:'Escopo e proposta alinhados com a empresa.'},admin.token);
+    check('Atualização de etapa mantém estimativa existente', (await client.find(quoted.id)).entity.preliminaryValue === 2500.75);
+    check('Cliente acompanha execução e retorno do administrador', (await client.find(quoted.id)).entity.statusLabel === 'Em execução');
+    await request('PUT','/requests/'+quoted.id,{status:'completed',admin_notes:'Integração entregue.'},admin.token);
+    check('Entrega mantém orçamento e histórico do projeto', (await client.find(quoted.id)).entity.statusLabel === 'Entregue' && (await client.find(quoted.id)).entity.formattedTotal === 'Sob orçamento');
+    check('Valores de solicitações anteriores permanecem monetários', (await client.find(order.id)).entity.formattedTotal.includes('451,50'));
     const faq = record('questions',await request('POST','/faqs',{question:'Auditoria '+run,answer:'Resposta de teste.',types_id:1},admin.token,201));
     await request('PUT','/faqs/'+faq.id,{active:0},admin.token);
     await request('GET','/faqs/'+faq.id,undefined,null,404);

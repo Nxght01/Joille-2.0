@@ -73,6 +73,12 @@ form.form.addEventListener("submit", async (event) => {
     try {
         const result = await contacts.create(message);
 
+        if (result.ok && result.data?.mail_status === 'failed') {
+            toast.warning(result.message);
+            showStatus(result.message, 'warning');
+            form.clear();
+            return;
+        }
         toast.fromResponse(result);
 
         if (!result.ok) {

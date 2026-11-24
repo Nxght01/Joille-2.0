@@ -21,7 +21,7 @@ const JWT_SECRET_KEY = "SUBSTITUA_POR_UMA_CHAVE_ALEATORIA_GERADA_LOCALMENTE";
 //
 // CONF_MAIL_MODE define para onde vão os e-mails:
 //
-//   "capture" — MODO DE TESTE (o atual). Nada sai para a internet: cada mensagem
+//   "capture" — MODO DE TESTE. Nada sai para a internet: cada mensagem
 //               é gravada como HTML em storage/mail/ e pode ser aberta no
 //               navegador em <URL_BASE>/storage/mail/. É assim que se testa o
 //               "esqueci minha senha" e o formulário de contato pelo frontend
@@ -30,20 +30,20 @@ const JWT_SECRET_KEY = "SUBSTITUA_POR_UMA_CHAVE_ALEATORIA_GERADA_LOCALMENTE";
 //   "smtp"    — PRODUÇÃO/APRESENTAÇÃO. Envia de verdade, e aí CONF_MAIL_USER e
 //               CONF_MAIL_PASSWD precisam estar preenchidos.
 //
-// Para enviar de verdade: troque para "smtp" e preencha os dois campos abaixo.
-// CONF_MAIL_PASSWD é uma "Senha de app" de 16 dígitos (Conta Google > Segurança >
+// Para configurar a credencial local: execute scripts/configure-gmail.ps1.
+// CONF_MAIL_PASSWD é uma "Senha de app" de 16 caracteres (Conta Google > Segurança >
 // pesquisar "Senhas de app"), NUNCA a senha real da conta.
-const CONF_MAIL_MODE = "capture";
+const CONF_MAIL_MODE = "smtp";
 
 const CONF_MAIL_HOST = "smtp.gmail.com";
 const CONF_MAIL_PORT = 587;
-const CONF_MAIL_USER = "";
-const CONF_MAIL_PASSWD = "";
+const CONF_MAIL_USER = "joilleifsul@gmail.com";
+define("CONF_MAIL_PASSWD", getenv("JOILLE_MAIL_PASSWORD") ?: (is_file(__DIR__ . "/Mail.secret.php") ? (string) require __DIR__ . "/Mail.secret.php" : ""));
 const CONF_MAIL_SECURITY = "tls"; // tls (587) ou ssl (465)
 const CONF_MAIL_SENDER_NAME = "Joille";
-const CONF_MAIL_SENDER_MAIL = "nao-responda@joille.test";
+const CONF_MAIL_SENDER_MAIL = "joilleifsul@gmail.com";
 // Caixa que recebe as mensagens do formulário de contato da área pública
-const CONF_MAIL_SUPPORT = "suporte@joille.test";
+const CONF_MAIL_SUPPORT = "joilleifsul@gmail.com";
 
 // Pasta onde o modo "capture" grava os e-mails, relativa à raiz do projeto
 const CONF_MAIL_CAPTURE_DIR = "storage/mail";
@@ -53,6 +53,6 @@ const CONF_PASSWORD_RESET_EXPIRE = 60;
 
 // --- Dados institucionais (usados nos e-mails e nos relatórios em PDF) -------
 const CONF_COMPANY_NAME = "Joille";
-const CONF_COMPANY_SLOGAN = "Gestão para joalherias e bijuterias";
+const CONF_COMPANY_SLOGAN = "Sistemas, redes e integração para empresas joalheiras";
 const CONF_COMPANY_ADDRESS = "Av. Presidente Vargas, 1234 - Centro, Sapucaia do Sul/RS";
 const CONF_COMPANY_PHONE = "(51) 3000-0000";

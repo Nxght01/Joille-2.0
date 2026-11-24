@@ -4,6 +4,7 @@ import { createToast } from "../../_common/prototypes/Toast.js";
 import AuthGuard from "../../_common/scripts/auth-guard.js";
 import SessionStorage from "../../_common/scripts/storage.js";
 import { getBackendUrl } from "../../_common/scripts/functions.js";
+import { renderProfile } from "../../_common/scripts/profile-display.js";
 
 const session = new SessionStorage("user");
 const guard = new AuthGuard(getBackendUrl("login"), "user", User.TYPE_CLIENT);
@@ -13,25 +14,15 @@ if (!guard.protect()) {
 }
 
 const toast = createToast();
-const stored = session.getUser();
-const user = User.fromApi(stored);
+renderProfile(session.getUser());
+
+// O evento storage sincroniza a foto e o nome em outras abas já abertas.
+window.addEventListener("storage", event => {
+    if (event.key === "joille_user") renderProfile(session.getUser());
+});
 
 const users = new UserService();
 users.setAuthToken(session.getToken());
-
-const imageUser = document.querySelector("#imageUser");
-const defaultPhoto = imageUser?.src;
-imageUser?.addEventListener("error", () => {
-    if (imageUser.src !== defaultPhoto) imageUser.src = defaultPhoto;
-});
-if (imageUser && user.photo) {
-    imageUser.src = getBackendUrl(user.photo);
-}
-
-const spanUser = document.querySelector("#span-user");
-if (spanUser) {
-    spanUser.textContent = `Olá, ${user.firstName}!`;
-}
 
 document.querySelector("#logout")?.addEventListener("click", (event) => {
     event.preventDefault();

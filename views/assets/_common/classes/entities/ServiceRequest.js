@@ -1,7 +1,7 @@
 import Entity from './Entity.js';
 
 export default class ServiceRequest extends Entity {
-    static statuses = {pending: 'Pendente', in_progress: 'Em atendimento', completed: 'Concluída', cancelled: 'Cancelada'};
+    static statuses = {pending: 'Em análise', in_progress: 'Em execução', completed: 'Entregue', cancelled: 'Cancelada'};
     #serviceId; #description; #quantity; #status; #unitPrice; #notes;
     constructor(data = {}) {
         super({id: data.id ?? null});
@@ -10,6 +10,7 @@ export default class ServiceRequest extends Entity {
         this.quantity = data.quantity ?? 1;
         this.status = data.status ?? 'pending';
         this.#unitPrice = Number(data.unit_price ?? 0);
+        this.preliminaryValue = data.preliminary_value == null ? null : Number(data.preliminary_value);
         this.notes = data.admin_notes ?? '';
         this.serviceName = data.service_name ?? '';
         this.customerName = data.customer_name ?? '';
@@ -23,7 +24,7 @@ export default class ServiceRequest extends Entity {
     get description() { return this.#description; }
     set description(value) {
         const text = String(value ?? '').trim();
-        if (text.length < 10 || text.length > 2000) throw new RangeError('Descreva o atendimento em 10 a 2000 caracteres.');
+        if (text.length < 10 || text.length > 2000) throw new RangeError('Descreva o projeto em 10 a 2000 caracteres.');
         this.#description = text;
     }
     get quantity() { return this.#quantity; }
@@ -44,6 +45,7 @@ export default class ServiceRequest extends Entity {
     get statusLabel() { return ServiceRequest.statuses[this.status]; }
     get canEdit() { return this.status === 'pending'; }
     get total() { return this.#unitPrice * this.quantity; }
-    get formattedTotal() { return this.total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}); }
+    get formattedTotal() { return this.#unitPrice === 0 ? 'Sob orçamento' : this.total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}); }
+    get formattedPreliminaryValue() { return this.preliminaryValue === null ? 'Ainda não definido' : this.preliminaryValue.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}); }
     toJSON() { return {services_id: this.serviceId, description: this.description, quantity: this.quantity}; }
 }

@@ -4,13 +4,13 @@ $this->layout("_theme");
 
 <?php $this->start("specific-script"); ?>
 <link rel="stylesheet" href="<?= url("views/assets/public/styles/contato.css"); ?>">
-<script type="module" src="<?= url("views/assets/public/scripts/contact.js"); ?>"></script>
+<script type="module" src="<?= url("views/assets/public/scripts/contact.js"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/public/scripts/contact.js'); ?>"></script>
 <?php $this->end(); ?>
 
 <div class="container">
     <h2>Entre em Contato</h2>
     <p class="contact-intro">
-        Preencha o formulário e nossa equipe responderá no e-mail informado.
+        Conte quais áreas, máquinas ou sistemas sua empresa deseja integrar. Nossa equipe responderá no e-mail informado.
         Você também receberá uma cópia da sua mensagem.
     </p>
 
@@ -40,7 +40,7 @@ $this->layout("_theme");
 
         <div class="form-group">
             <label for="subject">Assunto:</label>
-            <input type="text" id="subject" name="subject" placeholder="Ex.: Orçamento de banho de ouro">
+            <input type="text" id="subject" name="subject" placeholder="Ex.: Integração de produção e estoque">
         </div>
 
         <div class="form-group">

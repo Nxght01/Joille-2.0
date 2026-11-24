@@ -138,6 +138,7 @@ export default class Service extends Entity {
 
     /** Valor formatado em real brasileiro, para exibição. */
     get formattedValue() {
+        if (this.#value === 0) return 'Sob orçamento';
         return this.#value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 

@@ -7,7 +7,7 @@ $this->layout("_theme");
 <?php $this->end(); ?>
 
 <?php $this->start("specific-script"); ?>
-<script type="module" src="<?= url("views/assets/admin/scripts/edit_category.js"); ?>"></script>
+<script type="module" src="<?= url("views/assets/admin/scripts/edit_category.js"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/admin/scripts/edit_category.js'); ?>"></script>
 <?php $this->end(); ?>
 
 <header>

@@ -59,7 +59,7 @@ export function CrudController({
         empty: "Nenhum registro cadastrado.",
         createTitle: "Novo registro",
         editTitle: "Editar registro",
-        confirmDelete: "Tem certeza que deseja inativar este registro?",
+        confirmDelete: "Tem certeza que deseja excluir este registro?",
         ...labels
     };
 
@@ -92,7 +92,7 @@ CrudController.prototype.closeModal = function closeModal() {
 // --- listagem ----------------------------------------------------------------
 
 CrudController.prototype.render = function render() {
-    const visible = this.items.filter((item) => this.filterFn(item));
+    const visible = this.items.filter((item) => item.isActive !== false && this.filterFn(item));
 
     if (visible.length === 0) {
         showEmpty(this.container, this.labels.empty);
@@ -179,7 +179,10 @@ CrudController.prototype.remove = async function remove(id) {
             return this;
         }
 
-        return this.load();
+        // A exclusão foi confirmada pela API: retire a linha sem depender de
+        // outra requisição. A listagem também omite inativos ao recarregar.
+        this.items = this.items.filter((item) => String(item.id) !== String(id));
+        return this.render();
     } catch (error) {
         console.error("Erro na requisição:", error);
         this.toast.error(serviceUnavailableMessage());

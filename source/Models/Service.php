@@ -198,6 +198,7 @@ class Service extends Model
                         categories.id AS category_id,
                         categories.name AS category_name,
                         COUNT(services.id) AS total,
+                        SUM(CASE WHEN services.id IS NOT NULL AND CAST(services.value AS DECIMAL(12,2)) = 0 THEN 1 ELSE 0 END) AS quoted,
                         COALESCE(SUM(CAST(services.value AS DECIMAL(12,2))), 0) AS total_value
                       FROM categories
                       LEFT JOIN services

@@ -7,6 +7,7 @@ import { createToast } from "../../_common/prototypes/Toast.js";
 import SessionStorage from "../../_common/scripts/storage.js";
 import { getBackendUrl } from "../../_common/scripts/functions.js";
 import { createAuthFailureHandler, serviceUnavailableMessage } from "../../_common/scripts/ui.js";
+import { renderProfile } from "../../_common/scripts/profile-display.js";
 
 const scope = document.querySelector('[data-profile-scope]')?.dataset.profileScope ?? 'user';
 const session = new SessionStorage(scope);
@@ -17,8 +18,8 @@ users.setAuthToken(session.getToken());
 const toast = createToast();
 const handleAuthFailure = createAuthFailureHandler({ session, toast, loginUrl: getBackendUrl(scope === 'admin' ? 'admin/login' : 'login') });
 
-const profileImg = document.querySelector("img[data-profile-photo]");
 const photoInput = document.querySelector("#photo");
+const photoStatus = document.querySelector("#photo-status");
 let uploadingPhoto = false;
 const clearPreview = bindImagePreview(photoInput, document.querySelector("#photoPreview"),
     files => validateImages(files, 1), message => toast.warning(message));
@@ -36,7 +37,9 @@ const photoForm = new FormController(document.querySelector("#form-photo"), {
 
 /** Guarda no localStorage os dados mínimos da sessão, sem senha. */
 function persist(changes) {
-    session.saveSession(session.getToken(), { ...session.getUser(), ...changes });
+    const profile = { ...session.getUser(), ...changes };
+    session.saveSession(session.getToken(), profile);
+    renderProfile(profile);
 }
 
 // --- carregar o perfil -------------------------------------------------------
@@ -45,12 +48,9 @@ try {
     const result = await users.me();
 
     if (result.ok) {
-        persist({ photo: result.entity.photo });
+        persist(result.entity.toSession());
         profileForm.fill({ name: result.entity.name, email: result.entity.email, address: result.entity.address, phone: result.entity.phone });
 
-        if (profileImg && result.entity.photo) {
-            profileImg.src = getBackendUrl(result.entity.photo);
-        }
     } else {
         handleAuthFailure(result);
         toast.fromResponse(result);
@@ -114,6 +114,7 @@ photoForm.form.addEventListener("submit", async (event) => {
         return;
     }
     const payload = photoForm.serialize();
+    if (photoStatus) photoStatus.hidden = true;
     uploadingPhoto = true;
     photoInput.disabled = true;
     photoForm.setBusy(true);
@@ -128,15 +129,19 @@ photoForm.form.addEventListener("submit", async (event) => {
             return;
         }
 
-        const photo = result.data?.photo ?? null;
-        persist({ photo });
-
-        if (profileImg && photo) {
-            profileImg.src = getBackendUrl(photo);
+        const photo = result.data?.photo;
+        if (!photo) {
+            toast.error("Não foi possível carregar a nova foto. Tente novamente.");
+            return;
         }
+        persist({ photo, photoVersion: Date.now() });
 
         photoInput.value = "";
         clearPreview();
+        if (photoStatus) {
+            photoStatus.textContent = "Foto atualizada.";
+            photoStatus.hidden = false;
+        }
     } catch (error) {
         console.error("Erro no upload:", error);
         toast.error(serviceUnavailableMessage());

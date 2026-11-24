@@ -1,0 +1,18 @@
+{
+  "services": [
+    {"category":"Redes e infraestrutura","name":"Diagnóstico e projeto de infraestrutura","description":"Mapeamento de áreas, máquinas e sistemas da empresa joalheira. Planejamento da rede física e digital, requisitos de acesso e etapas de implantação."},
+    {"category":"Redes e infraestrutura","name":"Implantação de redes e conectividade","description":"Projeto e implantação de cabeamento, redes locais, Wi-Fi corporativo e conexão entre unidades. Dimensionamento após avaliação técnica do ambiente."},
+    {"category":"Sistemas de gestão","name":"Desenvolvimento de sistemas de gestão","description":"Criação de sistemas web para integrar produção, estoque, comercial e administração de empresas joalheiras, com módulos definidos conforme o processo de cada negócio."},
+    {"category":"Integração e automação","name":"Integração de máquinas e produção","description":"Conexão de máquinas e coleta de dados para acompanhar a operação. Compatibilidade, interfaces e requisitos de segurança avaliados antes da implantação."},
+    {"category":"Integração e automação","name":"Integração de sistemas e dados","description":"Integração entre ERP, sistemas internos e aplicações web por APIs e conectores. Organização do fluxo de informações entre setores e unidades da empresa."},
+    {"category":"Suporte e evolução","name":"Suporte e evolução contínua","description":"Manutenção, acompanhamento e evolução dos sistemas e redes implantados. Escopo, periodicidade e condições de suporte definidos em proposta."}
+  ],
+  "faqs": [
+    {"question":"O que a Joille oferece?","answer":"A Joille é uma agência de tecnologia para o ramo joalheiro. Oferecemos criação de sistemas de gestão, infraestrutura de redes e integração de áreas, dados e máquinas."},
+    {"question":"Como solicito um orçamento?","answer":"Crie sua conta, escolha uma solução e envie o briefing em Meus projetos. Informe a empresa, os locais envolvidos, as áreas e os sistemas ou máquinas que deseja integrar. A equipe analisa o escopo e entra em contato."},
+    {"question":"O envio do briefing confirma a contratação?","answer":"Não. Os serviços são sob orçamento. Preço, prazo, escopo e condições de suporte são definidos após a análise e precisam ser alinhados com sua empresa antes da execução."},
+    {"question":"Vocês trabalham com redes físicas e sistemas digitais?","answer":"Sim. O catálogo contempla planejamento e implantação de redes físicas, desenvolvimento de sistemas web e integração de dados. A necessidade de visitas presenciais é definida na análise do projeto."},
+    {"question":"Qualquer máquina pode ser integrada?","answer":"A viabilidade depende das interfaces, protocolos, documentação e condições de cada equipamento. A compatibilidade e os requisitos de segurança são avaliados antes de propor a integração."},
+    {"question":"Como acompanho meu projeto?","answer":"Acesse Meus projetos na área do cliente para consultar o briefing, a situação e os retornos da equipe. As etapas são Em análise, Em execução e Entregue; projetos cancelados permanecem no histórico."}
+  ]
+}
