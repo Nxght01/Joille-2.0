@@ -5,6 +5,12 @@
 --   001 — paridade com o padrão acme (users_types, type_id, active, types)
 --   002 — service_images, password_resets e ajustes em contacts
 --   003 — UNIQUE em users.email, índices de busca e COMMENT nas tabelas
+--   004 a 006 — projetos, catálogo da agência e valor preliminar
+--
+-- Instalação nova em MySQL/MariaDB: execute o arquivo completo.
+-- ATENÇÃO: a importação recria as tabelas e substitui os dados existentes.
+-- Safe Updates é desativado somente nesta sessão durante a importação e
+-- restaurado ao final. Não é necessário alterar preferências do Workbench.
 --
 -- Importar este arquivo é o caminho mais simples: ele já traz a estrutura final,
 -- os índices, os comentários e os dados de referência (perfis de acesso, tipos de
@@ -22,6 +28,9 @@
 -- tabelas e colunas aparecem no diagrama. Detalhes em README.md desta pasta.
 -- ---------------------------------------------------------------------------
 
+
+SET @JOILLE_IMPORT_SAFE_UPDATES = @@SESSION.SQL_SAFE_UPDATES;
+SET SESSION SQL_SAFE_UPDATES = 0;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -326,3 +335,5 @@ INSERT INTO questions (types_id,question,answer,created_at,active) SELECT 1,'Com
 ALTER TABLE service_requests
     ADD COLUMN preliminary_value DECIMAL(12,2) NULL DEFAULT NULL
     COMMENT 'Estimativa total do projeto definida pelo administrador';
+
+SET SESSION SQL_SAFE_UPDATES = @JOILLE_IMPORT_SAFE_UPDATES;

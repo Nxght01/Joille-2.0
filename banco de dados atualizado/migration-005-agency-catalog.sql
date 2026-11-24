@@ -1,4 +1,6 @@
 -- Catálogo da agência Joille. Aplicar pelo script com backup; mantém solicitações e imagens anteriores.
+SET @JOILLE_CATALOG_SAFE_UPDATES = @@SESSION.SQL_SAFE_UPDATES;
+SET SESSION SQL_SAFE_UPDATES = 0;
 UPDATE services SET active=0 WHERE name NOT IN ('Diagnóstico e projeto de infraestrutura','Implantação de redes e conectividade','Desenvolvimento de sistemas de gestão','Integração de máquinas e produção','Integração de sistemas e dados','Suporte e evolução contínua');
 UPDATE categories SET active=0 WHERE name NOT IN ('Redes e infraestrutura','Sistemas de gestão','Integração e automação','Suporte e evolução');
 INSERT INTO categories (name,active) SELECT 'Redes e infraestrutura',1 WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Redes e infraestrutura');
@@ -18,3 +20,5 @@ INSERT INTO questions (types_id,question,answer,created_at,active) SELECT 1,'O e
 INSERT INTO questions (types_id,question,answer,created_at,active) SELECT 1,'Vocês trabalham com redes físicas e sistemas digitais?','Sim. O catálogo contempla planejamento e implantação de redes físicas, desenvolvimento de sistemas web e integração de dados. A necessidade de visitas presenciais é definida na análise do projeto.',NOW(),1 WHERE NOT EXISTS (SELECT 1 FROM questions WHERE question='Vocês trabalham com redes físicas e sistemas digitais?');
 INSERT INTO questions (types_id,question,answer,created_at,active) SELECT 1,'Qualquer máquina pode ser integrada?','A viabilidade depende das interfaces, protocolos, documentação e condições de cada equipamento. A compatibilidade e os requisitos de segurança são avaliados antes de propor a integração.',NOW(),1 WHERE NOT EXISTS (SELECT 1 FROM questions WHERE question='Qualquer máquina pode ser integrada?');
 INSERT INTO questions (types_id,question,answer,created_at,active) SELECT 1,'Como acompanho meu projeto?','Acesse Meus projetos na área do cliente para consultar o briefing, a situação e os retornos da equipe. As etapas são Em análise, Em execução e Entregue; projetos cancelados permanecem no histórico.',NOW(),1 WHERE NOT EXISTS (SELECT 1 FROM questions WHERE question='Como acompanho meu projeto?');
+
+SET SESSION SQL_SAFE_UPDATES = @JOILLE_CATALOG_SAFE_UPDATES;
