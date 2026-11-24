@@ -6,7 +6,7 @@
     <title>..:: Painel de Administração ::..</title>
     <link rel="stylesheet" href="<?= url("views/assets/_common/styles/states.css"); ?>">
     <link rel="stylesheet" href="<?= url("views/assets/admin/styles/_theme.css"); ?>">
-    <script type="module" src="<?= url("views/assets/admin/scripts/_theme.js"); ?>"></script>
+    <script type="module" src="<?= url("views/assets/admin/scripts/_theme.js"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/admin/scripts/_theme.js'); ?>"></script>
     <?php if ($this->section("specific-style")): ?>
         <?= $this->section("specific-style"); ?>
     <?php endif; ?>
@@ -24,7 +24,7 @@
 </header>
 
 <nav>
-    <a href="<?= url("admin/"); ?>">Dashboard</a>
+    <a href="<?= url("admin/dashboard"); ?>">Dashboard</a>
     <a href="<?= url('admin/perfil'); ?>">Meu perfil</a>
     <a href="<?= url('admin/solicitacoes'); ?>">Solicitações</a>
     <a href="<?= url("admin/editar-usuario"); ?>">Gerenciar Usuários</a>

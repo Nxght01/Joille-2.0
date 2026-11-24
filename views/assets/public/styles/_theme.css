@@ -55,11 +55,17 @@ body > header {
    ========================================================================== */
 .header-nav-list {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 10px;
     list-style: none;
     /* Reset útil caso você use a tag <ul> no HTML */
     margin: 0;
     padding: 0;
+}
+
+#nav-greeting {
+    color: #ecf0f1;
 }
 
 .header-nav-list a {

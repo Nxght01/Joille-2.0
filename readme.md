@@ -123,6 +123,11 @@ Usuários já cadastrados para teste:
 
 **Troque essas senhas antes de qualquer uso real.**
 
+O endereço `/admin` redireciona para `/admin/login`. Após autenticar uma conta de
+administrador, o sistema abre `/admin/dashboard`. O login administrativo usa o
+mesmo tema do login de cliente, com uma sessão separada; ao sair do painel, volta
+para `/admin/login`.
+
 ### Configuração do e-mail
 
 `CONF_MAIL_MODE`, em `source/Config/Config.php`, decide para onde vão as mensagens.

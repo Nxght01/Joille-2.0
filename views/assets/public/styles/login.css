@@ -56,3 +56,25 @@ button:hover {
     background-color: #9aa7b1;
     cursor: progress;
 }
+
+.login-container.admin-login {
+    width: 100%;
+    max-width: 480px;
+    margin: 32px auto;
+}
+
+.admin-login h1 {
+    margin: 0 0 12px;
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+.admin-login input {
+    min-height: 44px;
+    font-size: 1rem;
+}
+
+.admin-login :is(input, button, a):focus-visible {
+    outline: 2px solid #0056b3;
+    outline-offset: 3px;
+}

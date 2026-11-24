@@ -11,6 +11,12 @@ class Admin
     public function __construct()
     {
         $this->view = new Engine(__DIR__ . "/../../themes/adm","php");
+        $this->view->addFolder("web", __DIR__ . "/../../themes/web");
+    }
+
+    public function entry(): void
+    {
+        header("Location: " . url("admin/login"), true, 302);
     }
 
     public function home ()

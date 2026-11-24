@@ -42,5 +42,5 @@ if (spanAdmin && stored) {
 document.querySelector("#logout")?.addEventListener("click", (event) => {
     event.preventDefault();
     session.clearSession();
-    window.location.href = getBackendUrl();
+    window.location.replace(getBackendUrl("admin/login"));
 });

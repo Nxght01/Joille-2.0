@@ -10,10 +10,10 @@
         do cliente e do painel já a tinham; só a área pública estava sem.
     -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>..:: Joille ::..</title>
+    <title><?= $this->e($pageTitle ?? "..:: Joille ::.."); ?></title>
 
     <link rel="stylesheet" href="<?= url("views/assets/_common/styles/states.css"); ?>">
-    <link rel="stylesheet" href="<?= url("views/assets/public/styles/_theme.css"); ?>">
+    <link rel="stylesheet" href="<?= url("views/assets/public/styles/_theme.css"); ?>?v=<?= filemtime(__DIR__ . '/../../views/assets/public/styles/_theme.css'); ?>">
     <script type="module" src="<?= url("views/assets/public/scripts/_theme.js"); ?>"></script>
 
     <?php if ($this->section("specific-script")): ?>

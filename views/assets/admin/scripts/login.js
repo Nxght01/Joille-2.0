@@ -1,4 +1,5 @@
 import UserService from "../../_common/classes/services/UserService.js";
+import User from "../../_common/classes/entities/User.js";
 import FormController from "../../_common/prototypes/FormController.js";
 import { createToast } from "../../_common/prototypes/Toast.js";
 import SessionStorage from "../../_common/scripts/storage.js";
@@ -16,7 +17,7 @@ const form = new FormController(document.querySelector("#formAdmin"), {
         password: { required: true, label: "A senha" }
     }
 });
--
+
 form.form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -40,7 +41,7 @@ form.form.addEventListener("submit", async (event) => {
 
         const admin = result.entity;
 
-        if (!admin?.token) {
+        if (!admin?.token || admin.typeId !== User.TYPE_ADMIN) {
             toast.error("O servidor não retornou uma sessão válida.");
             return;
         }
@@ -49,7 +50,7 @@ form.form.addEventListener("submit", async (event) => {
         toast.success(`Olá, ${admin.firstName}, bom trabalho!`);
 
         setTimeout(() => {
-            window.location.href = getBackendUrl("admin/");
+            window.location.replace(getBackendUrl("admin/dashboard"));
         }, 1200);
     } catch (error) {
         console.error("Erro na requisição:", error);

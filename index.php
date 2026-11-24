@@ -37,8 +37,9 @@ $route->group(null);
 
 $route->group("/admin");
 
-$route->get("/", "Admin:home");
+$route->get("/", "Admin:entry");
 $route->get("/login", "Admin:login");
+$route->get("/dashboard", "Admin:home");
 $route->get("/cadastro-produtos", "Admin:editServices");
 $route->get("/perfil", "Admin:profile");
 $route->get("/redefinir-senha", "Admin:password");
